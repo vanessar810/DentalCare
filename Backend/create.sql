@@ -1,0 +1,2 @@
+CREATE DATABASE db_clinic_250422;
+EXIT;

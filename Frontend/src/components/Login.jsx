@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import api from '../lib/api';
-import { useAuth } from '../providers/AuthProvider';
+import { validateForm } from '../utils/formValidator';
+import { createHandleChange } from '../utils/handleChange';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -13,61 +14,21 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { setAuth } = useAuth();
-
-
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 3) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const handleChange = createHandleChange(setFormData, setErrors);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+    console.log("iniciando sesion")
+    if (!validateForm(formData.email,formData.password)) return;
     setIsLoading(true);
     try {
-      const { data: { token } } = await api.post('/auth/login', formData);
+      const { data: token} = await api.post('/auth/login', formData);
       localStorage.setItem('token', token);
-      console.log("esto es una prueba")
-
-      const { data: patient } = await api.get('http://localhost:8080/patient/6');
-      setAuth({ patient, token });
-      console.log({ patient })
-
-      console.log("navigating...")
+      console.log("inicio de sesión exitoso")
       navigate('/patient', { replace: true });
-    } catch (err) {
+      } catch (err) {
       setErrors({ api: err.response?.data?.message || 'Error al iniciar sesión' });
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
     }
   };
 
@@ -97,7 +58,8 @@ const Login = () => {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full pl-10 pr-4 py-3  border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                className={`w-full pl-10 pr-4 py-3  border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors 
+                  ${errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
                 placeholder="Enter your email"
               />
@@ -124,7 +86,8 @@ const Login = () => {
                 type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={handleChange}
-                className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors 
+                  ${errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   }`}
                 placeholder="Enter your password"
               />
@@ -170,9 +133,12 @@ const Login = () => {
           <div className="flex justify-around">
             {/* Login Button */}
             <button
-              type="submit"
+              type="button"
+              onClick={() => handleSubmit('login')}
               disabled={isLoading}
-              className="w-1/2 flex justify-center py-3 px-4 mx-2 border border-transparent rounded-lg shadow-sm text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-1/2 flex justify-center py-3 px-4 mx-2 border border-transparent rounded-lg shadow-sm text-white bg-gradient-to-r 
+              from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 
+              font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <div className="flex items-center">
@@ -183,23 +149,6 @@ const Login = () => {
                 'LogIn'
               )}
             </button>
-            
-            {/* Register Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-1/2 flex justify-center py-3 px-4 mx-2 border border-transparent rounded-lg shadow-sm text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <div className="flex items-center">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  Signing in...
-                </div>
-              ) : (
-                'Sign In'
-              )}
-            </button>
-
           </div>
         </form>
         {/* Footer */}
@@ -214,7 +163,6 @@ const Login = () => {
           </p>
         </div>
       </div>
-
     </div>
   );
 }

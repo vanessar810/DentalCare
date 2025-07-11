@@ -14,4 +14,5 @@ public interface IPatientService {
      List<Patient> readAll();
      void update(Patient patient);
      void delete(Integer id) throws ResourceNotFoundException;
+     PatientResponseDto createPatientProfile(PatientRequestDto patientRequestDto, String email);
 }

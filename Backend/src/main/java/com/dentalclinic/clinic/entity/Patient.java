@@ -30,6 +30,10 @@ public class Patient {
     @OneToMany(mappedBy = "patient",  cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<Appointment> appointmentSet = new HashSet<>();
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
 }
 
 

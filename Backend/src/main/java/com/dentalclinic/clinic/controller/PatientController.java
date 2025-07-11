@@ -3,10 +3,14 @@ package com.dentalclinic.clinic.controller;
 import com.dentalclinic.clinic.Dto.request.PatientRequestDto;
 import com.dentalclinic.clinic.Dto.response.PatientResponseDto;
 import com.dentalclinic.clinic.entity.Patient;
+import com.dentalclinic.clinic.entity.User;
 import com.dentalclinic.clinic.exception.ResourceNotFoundException;
 import com.dentalclinic.clinic.service.IPatientService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,12 +24,24 @@ public class PatientController {
     public PatientController(IPatientService patientService) {
         this.patientService = patientService;
     }
-
+    // 🛡 Endpoint solo para ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<PatientResponseDto> createPatient(@RequestBody PatientRequestDto patient){
         PatientResponseDto patient1 = patientService.createPatient(patient);
         return ResponseEntity.status(HttpStatus.CREATED).body(patient1);
     }
+    // 👤 Endpoint para usuarios autenticados que completan su perfil
+    @PostMapping("/profile")
+    public  ResponseEntity<PatientResponseDto> createProfile(
+            @RequestBody PatientRequestDto patientRequestDto,
+            @AuthenticationPrincipal User user
+    ){
+        PatientResponseDto patientResponseDto = patientService.createPatientProfile(patientRequestDto, user.getEmail());
+        return ResponseEntity.status(HttpStatus.CREATED).body(patientResponseDto);
+    }
+
+
     @GetMapping
     public ResponseEntity<List<Patient>> readAll(){
          return ResponseEntity.ok(patientService.readAll());
@@ -55,4 +71,5 @@ public class PatientController {
             patientService.delete(id);
             return ResponseEntity.ok("{\"message\":\"patient deleted\"}");
     }
+
 }

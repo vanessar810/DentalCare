@@ -1,8 +1,10 @@
 package com.dentalclinic.clinic.auth;
 
+import com.dentalclinic.clinic.Dto.response.MeResponseDTO;
 import com.dentalclinic.clinic.configuration.JwtService;
 import com.dentalclinic.clinic.entity.User;
 import com.dentalclinic.clinic.entity.UserRole;
+import com.dentalclinic.clinic.repository.IPatientRepository;
 import com.dentalclinic.clinic.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final IUserRepository userRepository;
+    private final IPatientRepository patientRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
@@ -47,4 +50,9 @@ public class AuthenticationService {
                 .token(token)
                 .build();
     }
+    public MeResponseDTO getUserProfile(User user){
+        boolean hasProfile = patientRepository.existsByUser(user);
+        return new MeResponseDTO(user.getName(), user.getEmail(), hasProfile);
+    }
+
 }

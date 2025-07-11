@@ -25,6 +25,8 @@ public class SecurityConfiguration {
                             // endpoints that does not need authetication
                             auth.requestMatchers("/api/v1/auth/**").permitAll();
                             auth.requestMatchers("/api/v1/auth/login").permitAll();
+                            auth.requestMatchers("/api/v1/auth/register").permitAll();
+                            auth.requestMatchers("/api/patients/profile").authenticated();
                             auth.requestMatchers(HttpMethod.GET, "/odontologist/**").permitAll();
                             // endpoints swagger
                             auth.requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll();

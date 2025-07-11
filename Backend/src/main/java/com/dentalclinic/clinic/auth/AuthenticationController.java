@@ -1,7 +1,11 @@
 package com.dentalclinic.clinic.auth;
 
+import com.dentalclinic.clinic.Dto.response.MeResponseDTO;
+import com.dentalclinic.clinic.entity.User;
+import com.dentalclinic.clinic.repository.IPatientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,5 +20,9 @@ public class AuthenticationController {
     @PostMapping("/login")
     ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request){
         return ResponseEntity.ok(authenticationService.login(request));
+    }
+    @GetMapping("/me")
+    public ResponseEntity<MeResponseDTO> getMe(@AuthenticationPrincipal User user){
+        return ResponseEntity.ok(authenticationService.getUserProfile(user));
     }
 }

@@ -29,7 +29,8 @@ const User = () => {
       setUsers(prev => [...prev, newUser]);  
       setNewUser({ name: '', lastname: '', email: '', password: '' });
       localStorage.setItem('token', token);
-      navigate('/patient', { replace: true });
+      navigate('/patientForm', { state: { name: newUser.name, lastname: newUser.lastname, 
+        email: newUser.email }, replace: true });
     } catch (err) {
       setErrors({ api: err.response?.data?.message || 'Error al registrar' });
     } finally {
@@ -43,7 +44,7 @@ const User = () => {
   return (
     <div className="container mx-auto p-6 flex justify-center">
       <div className="text-center">
-        <h2 className="text-3xl font-bold mb-6 dark:text-white">Patient form register</h2>
+        <h2 className="text-3xl font-bold mb-6 dark:text-white"> Registration form</h2>
 
         <div className="max-w-lg bg-white p-6 rounded-lg shadow-md dark:bg-gray-800">
           <h3 className="text-xl font-semibold mb-4 dark:text-neutral-400">Add New Patient</h3>

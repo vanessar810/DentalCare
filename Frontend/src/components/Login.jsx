@@ -4,6 +4,7 @@ import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import api from '../lib/api';
 import { validateForm } from '../utils/formValidator';
 import { createHandleChange } from '../utils/handleChange';
+import { useAuth } from '../providers/AuthProvider';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -13,19 +14,36 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { setUser } = useAuth();
   const navigate = useNavigate();
   const handleChange = createHandleChange(setFormData, setErrors);
 
+
   const handleSubmit = async (e) => {
+    e.preventDefault();
     console.log("iniciando sesion")
     if (!validateForm(formData.email,formData.password)) return;
     setIsLoading(true);
+
     try {
-      const { data: token} = await api.post('/auth/login', formData);
-      localStorage.setItem('token', token);
+      const { data} = await api.post('/auth/login', formData);
+      const cleanToken = data.token.trim();
+      localStorage.setItem('token', cleanToken);
+  
+      api.defaults.headers.common.Authorization = `Bearer ${cleanToken}`;
+      console.log("token recibido:", cleanToken);
       console.log("inicio de sesión exitoso")
-      navigate('/patient', { replace: true });
-      } catch (err) {
+
+      const { data: me } = await api.get('auth/me');
+      setUser(me);
+
+      if (!me.hasPatientProfile) {
+        navigate('/patientForm',{ replace: true });
+      } else {
+        navigate('/dashboard',{ replace: true });
+      }
+    } catch (err) {
+      console.log("Login error:", err);
       setErrors({ api: err.response?.data?.message || 'Error al iniciar sesión' });
     } finally {
       setIsLoading(false);
@@ -133,8 +151,8 @@ const Login = () => {
           <div className="flex justify-around">
             {/* Login Button */}
             <button
-              type="button"
-              onClick={() => handleSubmit('login')}
+              type="submit"
+              
               disabled={isLoading}
               className="w-1/2 flex justify-center py-3 px-4 mx-2 border border-transparent rounded-lg shadow-sm text-white bg-gradient-to-r 
               from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 

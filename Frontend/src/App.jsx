@@ -6,6 +6,7 @@ import Appointments from './components/Appointments';
 import Services from './components/Services';
 import Login from './components/Login';
 import Patient from './components/Patient';
+import PatientForm from './components/PatientForm';
 import PrivateRoute from './components/PrivateRoute';
 import './App.css'
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Route path="services" element={<Services />} />
         <Route path="register" element={<Register />} />
         <Route path="patient" element={ <Patient />} />
+        <Route path="patientForm" element={ <PatientForm />} />
         <Route path="appointments" element={<PrivateRoute> <Appointments /></PrivateRoute>} />
         <Route path="*" element={<h1 className="text-center mt-10 dark:text-neutral-400">404 – Not Found</h1>} />
       </Route>

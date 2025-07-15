@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMoon, faLightbulb, faBars, faX } from '@fortawesome/free-solid-svg-icons';
 import { NavLink } from 'react-router-dom';
 import AuthMenuButton from './AuthMenubutton';
+import { useAuth } from '../providers/AuthProvider';
 
 // Navigation component
 const Navbar = () => {
@@ -12,11 +13,17 @@ const Navbar = () => {
 
   const toggleMobileMenu = () => setMenuOpen(!menuOpen);
   const closeMenu = () => setMenuOpen(false);
+  const { user, isAuthenticated, logout } = useAuth();
 
   return (
     <nav className="bg-blue-600 text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
         <h1 className="text-2xl font-bold">DentalCare Clinic</h1>
+        {isAuthenticated && (
+        <div>
+          Hola, {user?.name || 'usuario'}
+        </div>
+      )}
 
         <button
           className="md:hidden"

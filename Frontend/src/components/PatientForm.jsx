@@ -1,49 +1,77 @@
 import React from 'react'
-import { useLocation } from 'react-router-dom';
-import { useOutletContext } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import api from '../lib/api';
 
-const Patient = ({ patients, setPatients }) => {
-  const [newPatient, setNewPatient] = React.useState({
-    name: '',
-    lastname: '',
-    email: '',
-    dni: '',
-    inDate: '',
-    dateOfBirth: ''
-  });
-
+const PatientForm = () => {
   const location = useLocation();
   const userData = location.state || {};
-  console.log('userData:', userData);
+  // console.log('location', location)
+  // console.log('userData', userData)
+  const navigate = useNavigate();
+  const [newPatient, setNewPatient] = useState({
+    name: '',
+    lastname: '',
+    dni: '',
+    birthDate: '',
+    address: {
+      street: '',
+      number: '',
+      neighborhood: ''
+    }
+  });
 
   useEffect(() => {
-    setNewPatient(prev => ({
-      ...prev,
-      ...userData
-    }));
+    if (userData && Object.keys(userData).length > 0) {
+      setNewPatient(prev => ({
+        ...prev,
+        name: userData.name || '',
+        lastname: userData.lastname || '',
+      }));
+    }
   }, []);
-  
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setNewPatient(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    if (["street", "number", "neighborhood"].includes(name)) {
+      setNewPatient(prev => ({
+        ...prev,
+        address: {
+          ...(prev.address || {}),
+          [name]: value
+        }
+      }));
+    } else {
+      setNewPatient(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
+
 
   const handleAddPatient = async (e) => {
     e.preventDefault();
-    if (newPatient.name && newPatient.email) {
-      setPatients([...patients, { ...newPatient, id: Date.now() }]);
-      setNewPatient({ name: '', lastname:'', email: '', dni: '', inDate: '', dateOfBirth: ''});
-    }
     try {
-      await api.post('http://localhost:8080/patient/profile', newPatient);
-      console.log("Perfil de paciente creado");
-      // Puedes redirigir o mostrar mensaje
+      if (newPatient.name && newPatient.lastname) {
+        console.log(newPatient)
+        console.log(api.defaults.headers.common.Authorization);
+        await api.post('http://localhost:8080/patient/profile', newPatient);
+        console.log("Perfil de paciente creado");
+        setNewPatient({
+          name: '', lastname: '', dni: '', birthDate: '', address: {
+            street: '',
+            number: '', neighborhood: ''
+          }
+        });
+        console.log("Enviando a dashboard:", newPatient);
+        navigate('/dashboard', { state: {
+          name: newPatient.name, lastname: newPatient.lastname, 
+          dni: newPatient.dni, birthDate: newPatient.birthDate, 
+          address: newPatient.address
+        }, replace: true });
+      };
     } catch (error) {
       console.error("Error al crear paciente:", error);
     }
@@ -59,41 +87,64 @@ const Patient = ({ patients, setPatients }) => {
           <form onSubmit={handleAddPatient} className="space-y-4">
             <input
               type="text"
-              placeholder="Full Name"
-              value={newPatient.name + newPatient.lastname}
-              onChange={(e) => setNewPatient({ ...newPatient, name: e.target.value })}
+              name="name"
+              placeholder="Name"
+              value={newPatient.name}
+              onChange={handleChange}
               className="w-full p-3 border rounded-lg dark:bg-gray-300 dark:text-blue-800"
               required
             />
             <input
-              type="email"
-              placeholder="Email"
-              value={newPatient.email}
-              onChange={(e) => setNewPatient({ ...newPatient, email: e.target.value })}
-              className="w-full p-3 border rounded-lg dark:bg-gray-300"
+              type="text"
+              name="lastname"
+              placeholder="lastname"
+              value={newPatient.lastname}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-lg dark:bg-gray-300 dark:text-blue-800"
               required
             />
             <input
-              type="number"
+              type="text"
+              name="dni"
               placeholder="identification"
               value={newPatient.dni}
-              onChange={(e) => setNewPatient({ ...newPatient, dni: e.target.value })}
+              onChange={handleChange}
               className="w-full p-3 border rounded-lg dark:bg-gray-300"
             />
             <input
               type="date"
-              placeholder="today"
-              value={newPatient.inDate}
-              onChange={(e) => setNewPatient({ ...newPatient, inDate: e.target.value })}
-              className="w-full p-3 border rounded-lg dark:bg-gray-300"
-            />
-            <input
-              type="date"
+              name="birthDate"
               placeholder="Date of Birth"
-              value={newPatient.dateOfBirth}
-              onChange={(e) => setNewPatient({ ...newPatient, dateOfBirth: e.target.value })}
+              value={newPatient.birthDate}
+              onChange={handleChange}
               className="w-full p-3 border rounded-lg dark:bg-gray-300"
             />
+            <div className="w-full p-3 border rounded-lg flex justify-around dark:bg-gray-300">
+              <input
+                type="text"
+                name="street"
+                placeholder="street"
+                value={newPatient.address.street}
+                onChange={handleChange}
+                className="w-32 1 p-2 border rounded-lg dark:bg-gray-300"
+              />
+              <input
+                type="number"
+                name="number"
+                placeholder="number"
+                value={newPatient.address.number}
+                onChange={handleChange}
+                className="w-32 p-2 border rounded-lg dark:bg-gray-300"
+              />
+              <input
+                type="text"
+                name="neighborhood"
+                placeholder="neighborhood"
+                value={newPatient.address.neighborhood}
+                onChange={handleChange}
+                className="w-32 p-2 border rounded-lg dark:bg-gray-300"
+              />
+            </div>
             <button type="submit" className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 dark:text-neutral-400">
               Add Patient
             </button>
@@ -103,4 +154,4 @@ const Patient = ({ patients, setPatients }) => {
     </div>
   );
 };
-export default Patient
+export default PatientForm

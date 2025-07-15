@@ -3,10 +3,10 @@ import { useOutletContext, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import { validateForm } from '../utils/formValidator';
 import api from '../lib/api';
+import { useAuth } from '../providers/AuthProvider';
 
 
 const User = () => {
-  const { users, setUsers } =useOutletContext();
   const [newUser, setNewUser] = useState({
     name: '',
     lastname: '',
@@ -17,6 +17,7 @@ const User = () => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { storeToken } = useAuth();
 
   const handleAddUser = async (e) => {
     e.preventDefault();
@@ -24,21 +25,27 @@ const User = () => {
     if (!validateForm(newUser.email, newUser.password)) return;
     setIsLoading(true);
     try {
-      const { data: token } = await api.post('/auth/register', newUser);
+      const {data} = await api.post('/auth/register', newUser);
+      storeToken(data.token);
       console.log("successful register")
-      setUsers(prev => [...prev, newUser]);  
+
       setNewUser({ name: '', lastname: '', email: '', password: '' });
-      localStorage.setItem('token', token);
-      navigate('/patientForm', { state: { name: newUser.name, lastname: newUser.lastname, 
-        email: newUser.email }, replace: true });
+      console.log("Enviando a PatientForm:", newUser);
+      navigate('/patientForm', {
+        state: {
+          name: newUser.name, lastname: newUser.lastname
+        }, replace: true
+      });
     } catch (err) {
-      setErrors({ api: err.response?.data?.message || 'Error al registrar' });
+      if (err.response && err.response.status === 409) {
+        setErrors({ api: err.response.data });
+      } else {
+        setErrors({ api: err.response?.data?.message || 'Error al registrar' });
+      }
     } finally {
       setIsLoading(false);
     }
-    {errors.api && (
-  <p className="text-red-500 mt-2">{errors.api}</p>
-)}
+
   };
 
   return (
@@ -51,6 +58,7 @@ const User = () => {
           <form onSubmit={handleAddUser} className="space-y-4">
             <input
               type="text"
+              name="name"
               placeholder="Name"
               value={newUser.name}
               onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
@@ -59,6 +67,7 @@ const User = () => {
             />
             <input
               type="text"
+              name="lastname"
               placeholder="Lastname"
               value={newUser.lastname}
               onChange={(e) => setNewUser({ ...newUser, lastname: e.target.value })}
@@ -72,6 +81,7 @@ const User = () => {
               </div>
               <input
                 type="email"
+                name='email'
                 placeholder="Email"
                 value={newUser.email}
                 onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
@@ -110,9 +120,14 @@ const User = () => {
               </button>
             </div>
             <button type="submit" className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 dark:text-neutral-400"
-            disabled={isLoading}>
-            {isLoading ? 'Creating...' : 'Create'}
+              disabled={isLoading}>
+              {isLoading ? 'Creating...' : 'Create'}
             </button>
+            {
+              errors.api && (
+                <p className="text-red-500 mt-2">{errors.api}</p>
+              )
+            }
           </form>
         </div>
       </div>

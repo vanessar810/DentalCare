@@ -5,43 +5,46 @@ import api from '../lib/api';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [auth, setAuth] = useState(null);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   // Cargar usuario en memoria si ya hay token guardado
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (!token) return;
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      setUser({ email: payload.sub, roles: payload.roles });
-    } catch {
-      localStorage.removeItem('token');
+    if (token) {
+      api.defaults.headers.common.Authorization = `Bearer ${token}`;
+      api.get('/auth/me').then((response) => {
+        setUser(response.data);
+      }).catch(() => {
+        localStorage.removeItem('token');
+        delete api.defaults.headers.common.Authorization;
+      }).finally(() => {
+        setLoading(false);
+      });
+    } else {
+      setLoading(false);
     }
   }, []);
+  if (loading) return <p>Cargando...</p>;
 
-  const login = async (credentials) => {
-    const { data } = await api.post('/auth/login', credentials);
-    localStorage.setItem('token', data.token);
-    setUser(data.user || JSON.parse(atob(data.token.split('.')[1])));
-    navigate('/home', { replace: true });
+  const storeToken = (token) => {
+    const cleanToken = token.trim();
+    localStorage.setItem('token', cleanToken);
+    api.defaults.headers.common.Authorization = `Bearer ${cleanToken}`;
   };
 
   const logout = () => {
     localStorage.removeItem('token');
+    delete api.defaults.headers.common.Authorization;
     setUser(null);
-    navigate('/login', { replace: true });
   };
 
   const value = {
-    auth,
-    setAuth,
     user,
     setUser,
     isAuthenticated: !!user,
-    user,
-    login,
+    storeToken,
     logout,
   };
 

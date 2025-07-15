@@ -14,7 +14,7 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { setUser } = useAuth();
+  const { setUser, storeToken } = useAuth();
   const navigate = useNavigate();
   const handleChange = createHandleChange(setFormData, setErrors);
 
@@ -22,25 +22,22 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("iniciando sesion")
-    if (!validateForm(formData.email,formData.password)) return;
+    if (!validateForm(formData.email, formData.password)) return;
     setIsLoading(true);
 
     try {
-      const { data} = await api.post('/auth/login', formData);
-      const cleanToken = data.token.trim();
-      localStorage.setItem('token', cleanToken);
-  
-      api.defaults.headers.common.Authorization = `Bearer ${cleanToken}`;
-      console.log("token recibido:", cleanToken);
+      const { data } = await api.post('/auth/login', formData);
+      storeToken(data.token)
+      console.log("token recibido:", data.token);
       console.log("inicio de sesión exitoso")
 
-      const { data: me } = await api.get('auth/me');
+      const { data: me } = await api.get('/auth/me');
       setUser(me);
 
       if (!me.hasPatientProfile) {
-        navigate('/patientForm',{ replace: true });
+        navigate('/patientForm', { replace: true });
       } else {
-        navigate('/dashboard',{ replace: true });
+        navigate('/dashboard', { replace: true });
       }
     } catch (err) {
       console.log("Login error:", err);
@@ -152,7 +149,7 @@ const Login = () => {
             {/* Login Button */}
             <button
               type="submit"
-              
+
               disabled={isLoading}
               className="w-1/2 flex justify-center py-3 px-4 mx-2 border border-transparent rounded-lg shadow-sm text-white bg-gradient-to-r 
               from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 

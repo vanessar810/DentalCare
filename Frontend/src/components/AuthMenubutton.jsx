@@ -1,11 +1,14 @@
 // src/components/AuthMenuButton.jsx
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../providers/AuthProvider';
+
 
 export default function AuthMenuButton() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   /* ———— 1.  Cerrar menú con Escape u “clic‑afuera” ———— */
   useEffect(() => {
@@ -25,12 +28,14 @@ export default function AuthMenuButton() {
 
   /* ———— 2.  Acción de Logout ———— */
   const handleLogout = () => {
-    localStorage.removeItem('token'); 
-    // Por ejemplo: setAuth(null);  // si usas contexto global
-    navigate('/login');                    
+    logout();
+    setOpen(false);
+    setTimeout(() => {
+      navigate('/login', { replace: true });
+    }, 0);
   };
-  const openMenu   = () => setOpen(true);   
-  const closeMenu  = () => setOpen(false); 
+  const openMenu = () => setOpen(true);
+  const closeMenu = () => setOpen(false);
 
   /* ———— 3.  Render ———— */
   return (
@@ -38,8 +43,8 @@ export default function AuthMenuButton() {
       {/* Botón que abre/cierra el menú */}
       <button
         onClick={() => setOpen(!open)}
-        onMouseEnter={openMenu} 
-        onFocus={openMenu}   
+        onMouseEnter={openMenu}
+        onFocus={openMenu}
         aria-haspopup="true"
         aria-expanded={open}
         className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring"
@@ -69,7 +74,6 @@ export default function AuthMenuButton() {
           <button
             onClick={() => {
               handleLogout();
-              setOpen(false);
             }}
             className="block px-4 py-2 text-gray-700 hover:bg-indigo-50"
           >

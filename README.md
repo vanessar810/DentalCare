@@ -8,7 +8,7 @@ A full-stack web application for managing a dental clinic. Includes secure patie
 - **Backend**: Java, Spring Boot
 - **Database**: MySQL
 - **Authentication**: JWT
-- **Deployment**: Docker, AWS (soon)
+//- **Deployment**: Docker, AWS (soon)
 
 ## ✨ Features
 
@@ -19,9 +19,4 @@ A full-stack web application for managing a dental clinic. Includes secure patie
 - Responsive user interface
 - JWT-based secure authentication
 
-### Prerequisites
 
-- Node.js
-- Java 17+
-- MySQL
-- Maven

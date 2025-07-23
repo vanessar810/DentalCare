@@ -3,6 +3,8 @@ package com.dentalclinic.clinic.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,8 +23,9 @@ public class Patient {
     private String name;
     private String lastname;
     private String dni;
+    @CreationTimestamp
     private LocalDate inDate;
-    private LocalDate BirthDate;
+    private LocalDate birthDate;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")

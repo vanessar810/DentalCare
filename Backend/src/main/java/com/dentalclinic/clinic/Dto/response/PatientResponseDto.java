@@ -1,6 +1,9 @@
 package com.dentalclinic.clinic.Dto.response;
 
+import com.dentalclinic.clinic.entity.Address;
 import lombok.*;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -12,4 +15,6 @@ public class PatientResponseDto {
     private String name;
     private String lastname;
     private String dni;
+    private LocalDate birthDate;
+    private Address address;
 }

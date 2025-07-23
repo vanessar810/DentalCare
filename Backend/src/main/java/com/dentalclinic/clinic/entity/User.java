@@ -38,6 +38,7 @@ public class User implements UserDetails {
     }
 
     @Override
+    @Column(unique = true)
     public String getUsername() {return email;}
 
     @Override

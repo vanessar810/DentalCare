@@ -1,6 +1,6 @@
 package com.dentalclinic.clinic.Dto.request;
 
-import com.dentalclinic.clinic.entity.Address;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -14,7 +14,7 @@ public class PatientRequestDto {
     private String name;
     private String lastname;
     private String dni;
-    private LocalDate inDate;
-    private LocalDate BirthDate;
-    private Address address;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate birthDate;
+    private AddressDto address;
 }

@@ -4,6 +4,7 @@ import com.dentalclinic.clinic.Dto.response.MeResponseDTO;
 import com.dentalclinic.clinic.configuration.JwtService;
 import com.dentalclinic.clinic.entity.User;
 import com.dentalclinic.clinic.entity.UserRole;
+import com.dentalclinic.clinic.exception.EmailAlreadyUsedException;
 import com.dentalclinic.clinic.repository.IPatientRepository;
 import com.dentalclinic.clinic.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,9 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new EmailAlreadyUsedException("This email is already in use.");
+        }
         User user = User.builder()
                 .name(request.getName())
                 .lastname(request.getLastname())
@@ -52,7 +56,7 @@ public class AuthenticationService {
     }
     public MeResponseDTO getUserProfile(User user){
         boolean hasProfile = patientRepository.existsByUser(user);
-        return new MeResponseDTO(user.getName(), user.getEmail(), hasProfile);
+        return new MeResponseDTO(user.getName(), user.getEmail(), hasProfile, user.getUserRole());
     }
 
 }

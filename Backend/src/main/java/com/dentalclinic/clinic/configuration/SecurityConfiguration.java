@@ -26,7 +26,6 @@ public class SecurityConfiguration {
                             auth.requestMatchers("/api/v1/auth/**").permitAll();
                             auth.requestMatchers("/api/v1/auth/login").permitAll();
                             auth.requestMatchers("/api/v1/auth/register").permitAll();
-                            auth.requestMatchers("/api/patients/profile").authenticated();
                             auth.requestMatchers(HttpMethod.GET, "/odontologist/**").permitAll();
                             // endpoints swagger
                             auth.requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll();
@@ -37,8 +36,12 @@ public class SecurityConfiguration {
                             auth.requestMatchers(HttpMethod.POST,"/odontologist/**").hasAnyAuthority("ADMIN");
                             auth.requestMatchers(HttpMethod.PUT,"/odontologist/**").hasAnyAuthority("ADMIN");
                             auth.requestMatchers(HttpMethod.DELETE,"/odontologist/**").hasAnyAuthority("ADMIN");
-                            auth.requestMatchers("/patient/**").hasAnyAuthority("ADMIN");
+                            auth.requestMatchers(HttpMethod.POST, "/patient/profile").hasAnyAuthority("ADMIN", "USER");
+                            auth.requestMatchers(HttpMethod.GET, "/patient/profile").hasAnyAuthority("ADMIN", "PATIENT");
                             auth.requestMatchers(HttpMethod.POST,"/patient/**").hasAnyAuthority("ADMIN");
+                            auth.requestMatchers("/patient/**").hasAnyAuthority("ADMIN");
+                            auth.requestMatchers(HttpMethod.GET,"/appointment/user").hasAnyAuthority("PATIENT");
+
                             auth.requestMatchers(HttpMethod.PUT,"/patient/**").hasAnyAuthority("ADMIN");
                             auth.requestMatchers(HttpMethod.DELETE,"/patient/**").hasAnyAuthority("ADMIN");
 

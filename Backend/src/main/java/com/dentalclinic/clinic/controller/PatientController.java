@@ -1,6 +1,7 @@
 package com.dentalclinic.clinic.controller;
 
 import com.dentalclinic.clinic.Dto.request.PatientRequestDto;
+import com.dentalclinic.clinic.Dto.response.PatientResponse2Dto;
 import com.dentalclinic.clinic.Dto.response.PatientResponseDto;
 import com.dentalclinic.clinic.entity.Patient;
 import com.dentalclinic.clinic.entity.User;
@@ -70,6 +71,16 @@ public class PatientController {
     public ResponseEntity<String> deletePatient(@PathVariable Integer id) throws ResourceNotFoundException {
             patientService.delete(id);
             return ResponseEntity.ok("{\"message\":\"patient deleted\"}");
+    }
+    @GetMapping("/me")
+    public ResponseEntity<PatientResponse2Dto> getMyInfo(@AuthenticationPrincipal User user) throws ResourceNotFoundException {
+        PatientResponse2Dto patientResponse2Dto = patientService.getPatientInfo(user);
+        return ResponseEntity.ok(patientResponse2Dto);
+    }
+    @GetMapping("/profile")
+    public ResponseEntity<PatientResponseDto> getProfile(@AuthenticationPrincipal User user) throws ResourceNotFoundException {
+        PatientResponseDto patientResponseDto = patientService.getProfile(user);
+        return ResponseEntity.ok(patientResponseDto);
     }
 
 }

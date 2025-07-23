@@ -3,6 +3,7 @@ package com.dentalclinic.clinic.service;
 import com.dentalclinic.clinic.Dto.request.PatientRequestDto;
 import com.dentalclinic.clinic.Dto.response.AppointmentResponseDto;
 import com.dentalclinic.clinic.Dto.response.OdontologistResponseDto;
+import com.dentalclinic.clinic.Dto.response.PatientResponse2Dto;
 import com.dentalclinic.clinic.Dto.response.PatientResponseDto;
 import com.dentalclinic.clinic.entity.Appointment;
 import com.dentalclinic.clinic.entity.Patient;
@@ -40,6 +41,7 @@ public class PatientService implements IPatientService{
     }
     @Transactional
     public PatientResponseDto createPatientProfile(PatientRequestDto patientRequestDto, String email){
+        System.out.println("fecha de nacimiento: "+ patientRequestDto.getBirthDate());
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->new RuntimeException("User not found"));
         if (user.getUserRole() == UserRole.PATIENT){
@@ -75,11 +77,29 @@ public class PatientService implements IPatientService{
         else
             throw new ResourceNotFoundException("{\"message\":\"patient not found\"}");
     }
+    public PatientResponse2Dto getPatientInfo(User user) throws ResourceNotFoundException {
+        Patient patientOptional = patientRepository.findByUser(user)
+                .orElseThrow(() -> new ResourceNotFoundException("{\"message\":\"patient not found\"}"));
+
+        return mapToResponseDto2(patientOptional);
+    }
+    public PatientResponseDto getProfile(User user) throws ResourceNotFoundException {
+        Patient patientOptional = patientRepository.findByUser(user)
+                .orElseThrow(() -> new ResourceNotFoundException("{\"message\":\"patient not found\"}"));
+        return mapToResponseDto(patientOptional);
+    }
+
     private Patient mapToEntity(PatientRequestDto patientRequestDto){
-        return  modelMapper.map(patientRequestDto,Patient.class);
+       Patient patient = modelMapper.map(patientRequestDto, Patient.class);
+               patient.setBirthDate(patientRequestDto.getBirthDate());
+        return  patient;
+
     }
     private PatientResponseDto mapToResponseDto(Patient patient){
         return modelMapper.map(patient, PatientResponseDto.class);
+    }
+    private PatientResponse2Dto mapToResponseDto2(Patient patient){
+        return modelMapper.map(patient, PatientResponse2Dto.class);
     }
 
 }

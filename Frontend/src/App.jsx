@@ -9,7 +9,8 @@ import Patient from './components/Patient';
 import PatientForm from './components/PatientForm';
 import PrivateRoute from './components/PrivateRoute';
 import './App.css'
-import Dashboard from './components/Dashboard';
+import DashboardPatient from './components/DashboardPatient';
+import DashboardAdmin from './components/DashboardAdmin';
 function App() {
   return (
     <Routes>
@@ -21,7 +22,8 @@ function App() {
         <Route path="patient" element={ <Patient />} />
         <Route path="patientForm" element={ <PatientForm />} />
         <Route path="appointments" element={<PrivateRoute> <Appointments /></PrivateRoute>} />
-        <Route path="dashboard" element={<PrivateRoute> <Dashboard /></PrivateRoute>} />
+        <Route path="dashboardPatient" element={<PrivateRoute> <DashboardPatient /></PrivateRoute>} />
+        <Route path="dashboardAdmin" element={<PrivateRoute> <DashboardAdmin /></PrivateRoute>} />
         <Route path="*" element={<h1 className="text-center mt-10 dark:text-neutral-400">404 – Not Found</h1>} />
       </Route>
     </Routes >

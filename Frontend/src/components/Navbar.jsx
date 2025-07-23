@@ -42,7 +42,6 @@ const Navbar = () => {
           `}>
           <NavLink to="/" className={({ isActive }) => `px-4 py-2 rounded ${isActive ? 'bg-blue-800' : 'hover:bg-blue-700'}`}>Home</NavLink>
           <NavLink to="/register" className={({ isActive }) => `px-4 py-2 rounded ${isActive ? 'bg-blue-800' : 'hover:bg-blue-700'}`}>Register</NavLink>
-          <NavLink to="/appointments" className={({ isActive }) => `px-4 py-2 rounded ${isActive ? 'bg-blue-800' : 'hover:bg-blue-700'}`}>Appointments</NavLink>
           <NavLink to="/services" className={({ isActive }) => `px-4 py-2 rounded ${isActive ? 'bg-blue-800' : 'hover:bg-blue-700'}`}>Services</NavLink>
           <AuthMenuButton />
           <button

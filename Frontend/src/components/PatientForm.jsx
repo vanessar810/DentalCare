@@ -2,8 +2,10 @@ import React from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import api from '../lib/api';
+import { useAuth } from '../providers/AuthProvider';
 
 const PatientForm = () => {
+  const { setUser } = useAuth();
   const location = useLocation();
   const userData = location.state || {};
   // console.log('location', location)
@@ -59,6 +61,10 @@ const PatientForm = () => {
         console.log(api.defaults.headers.common.Authorization);
         await api.post('http://localhost:8080/patient/profile', newPatient);
         console.log("Perfil de paciente creado");
+        setUser(prev => ({
+        ...prev,
+        ...newPatient // 
+      }));
         setNewPatient({
           name: '', lastname: '', dni: '', birthDate: '', address: {
             street: '',
@@ -66,11 +72,7 @@ const PatientForm = () => {
           }
         });
         console.log("Enviando a dashboard:", newPatient);
-        navigate('/dashboard', { state: {
-          name: newPatient.name, lastname: newPatient.lastname, 
-          dni: newPatient.dni, birthDate: newPatient.birthDate, 
-          address: newPatient.address
-        }, replace: true });
+        navigate('/dashboardPatient', { state: { ...newPatient }, replace: true });
       };
     } catch (error) {
       console.error("Error al crear paciente:", error);

@@ -34,12 +34,19 @@ const Login = () => {
       const { data: me } = await api.get('/auth/me');
       setUser(me);
 
-      if (!me.hasPatientProfile) {
-        navigate('/patientForm', { replace: true });
+      if (me.role == 'ADMIN') {
+        navigate('/dashboardAdmin', { replace: true });
+      } else if (me.role === 'PATIENT') {
+        if (!me.hasPatientProfile) {
+          navigate('/patientForm', { replace: true });
+        } else {
+          navigate('/dashboardPatient', { replace: true });
+        }
       } else {
-        navigate('/dashboard', { replace: true });
+        etErrors({ api: 'Rol no found. Contact administration.' });
       }
-    } catch (err) {
+    }
+    catch (err) {
       console.log("Login error:", err);
       setErrors({ api: err.response?.data?.message || 'Error al iniciar sesión' });
     } finally {

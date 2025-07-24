@@ -59,7 +59,7 @@ const PatientForm = () => {
       if (newPatient.name && newPatient.lastname) {
         console.log(newPatient)
         console.log(api.defaults.headers.common.Authorization);
-        await api.post('http://localhost:8080/patient/profile', newPatient);
+        await api.post('/patient/profile', newPatient);
         console.log("Perfil de paciente creado");
         setUser(prev => ({
         ...prev,

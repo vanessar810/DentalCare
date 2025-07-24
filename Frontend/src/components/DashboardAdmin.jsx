@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Users, UserCheck, Calendar, Search, Save, X } from 'lucide-react';
+import api from '../lib/api';
 
 const DashboardAdmin = () => {
   const [activeTab, setActiveTab] = useState('patients');
@@ -12,55 +13,44 @@ const DashboardAdmin = () => {
   const [modalMode, setModalMode] = useState('create'); // 'create' or 'edit'
   const [selectedItem, setSelectedItem] = useState(null);
 
-  // Base API URL - adjust this to match your backend
-  const API_BASE = 'http://localhost:8080/api';
 
   // Generic API functions
-  const apiCall = async (endpoint, method = 'GET', data = null) => {
+  const apiCall = async (url, method = 'GET', data = null) => {
     try {
       const config = {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        url,
+        data,
       };
-      
-      if (data) {
-        config.body = JSON.stringify(data);
-      }
-
-      const response = await fetch(`${API_BASE}${endpoint}`, config);
-      
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
-      }
-      
-      return method === 'DELETE' ? true : await response.json();
-    } catch (error) {
-      console.error('API call failed:', error);
-      alert(`Operation failed: ${error.message}`);
-      return null;
+      const response = await api(config);
+      return response.data;
     }
+    catch (error) {
+      console.error('API call failes', error);
+      const message = error.response?.data?.message || error.message || 'Unkown error';
+      alert(`Operation failed: ${message}`);
+      return null;
+    } finally { setLoading(false); }
   };
 
   // Load data functions
   const loadPatients = async () => {
     setLoading(true);
-    const data = await apiCall('/patients');
+    const data = await apiCall('/patient');
     if (data) setPatients(Array.isArray(data) ? data : []);
     setLoading(false);
   };
 
   const loadOdontologists = async () => {
     setLoading(true);
-    const data = await apiCall('/odontologists');
+    const data = await apiCall('/odontologist');
     if (data) setOdontologists(Array.isArray(data) ? data : []);
     setLoading(false);
   };
 
   const loadAppointments = async () => {
     setLoading(true);
-    const data = await apiCall('/appointments');
+    const data = await apiCall('/appointment');
     if (data) setAppointments(Array.isArray(data) ? data : []);
     setLoading(false);
   };
@@ -68,11 +58,11 @@ const DashboardAdmin = () => {
   // CRUD operations
   const handleCreate = async (formData) => {
     const endpoints = {
-      patients: '/patients',
-      odontologists: '/odontologists',
-      appointments: '/appointments'
+      patients: '/patient',
+      odontologists: '/odontologist',
+      appointments: '/appointment'
     };
-    
+
     const result = await apiCall(endpoints[activeTab], 'POST', formData);
     if (result) {
       setShowModal(false);
@@ -82,11 +72,11 @@ const DashboardAdmin = () => {
 
   const handleUpdate = async (formData) => {
     const endpoints = {
-      patients: `/patients/${selectedItem.id}`,
-      odontologists: `/odontologists/${selectedItem.id}`,
-      appointments: `/appointments/${selectedItem.id}`
+      patients: `/patient/${selectedItem.id}`,
+      odontologists: `/odontologist/${selectedItem.id}`,
+      appointments: `/appointment/${selectedItem.id}`
     };
-    
+
     const result = await apiCall(endpoints[activeTab], 'PUT', formData);
     if (result) {
       setShowModal(false);
@@ -96,13 +86,13 @@ const DashboardAdmin = () => {
 
   const handleDelete = async (id) => {
     if (!confirm('Are you sure you want to delete this item?')) return;
-    
+
     const endpoints = {
-      patients: `/patients/${id}`,
-      odontologists: `/odontologists/${id}`,
-      appointments: `/appointments/${id}`
+      patients: `/patient/${id}`,
+      odontologists: `/odontologist/${id}`,
+      appointments: `/appointment/${id}`
     };
-    
+
     const result = await apiCall(endpoints[activeTab], 'DELETE');
     if (result) {
       loadCurrentTabData();
@@ -147,7 +137,7 @@ const DashboardAdmin = () => {
   const getFilteredData = () => {
     const data = getCurrentData();
     if (!searchTerm) return data;
-    
+
     return data.filter(item => {
       const searchableFields = Object.values(item).join(' ').toLowerCase();
       return searchableFields.includes(searchTerm.toLowerCase());
@@ -193,11 +183,10 @@ const DashboardAdmin = () => {
       switch (activeTab) {
         case 'patients':
           return [
-            { field: 'firstName', label: 'First Name', type: 'text', required: true },
-            { field: 'lastName', label: 'Last Name', type: 'text', required: true },
-            { field: 'email', label: 'Email', type: 'email', required: true },
-            { field: 'phone', label: 'Phone', type: 'tel', required: true },
-            { field: 'dateOfBirth', label: 'Date of Birth', type: 'date', required: true },
+            { field: 'Name', label: 'Name', type: 'text', required: true },
+            { field: 'lastname', label: 'Last Name', type: 'text', required: true },
+            { field: 'dni', label: 'DNI', type: 'text', required: true },
+            { field: 'birthDate', label: 'birthdate', type: 'date', required: true },
             { field: 'address', label: 'Address', type: 'text', required: false },
           ];
         case 'odontologists':
@@ -226,7 +215,7 @@ const DashboardAdmin = () => {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ">
-        <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-96 overflow-y-auto">
+        <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-96 overflow-y-auto dark:bg-gray-800">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">
               {modalMode === 'create' ? 'Create' : 'Edit'} {activeTab.slice(0, -1)}
@@ -235,11 +224,11 @@ const DashboardAdmin = () => {
               <X size={20} />
             </button>
           </div>
-          
+
           <form onSubmit={handleSubmit} className="space-y-4">
             {getFormFields().map(({ field, label, type, required, options }) => (
               <div key={field}>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-neutral-400">
                   {label} {required && <span className="text-red-500">*</span>}
                 </label>
                 {type === 'select' ? (
@@ -260,12 +249,12 @@ const DashboardAdmin = () => {
                     value={formData[field] || ''}
                     onChange={(e) => handleInputChange(field, e.target.value)}
                     required={required}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500  dark:bg-gray-800"
                   />
                 )}
               </div>
             ))}
-            
+
             <div className="flex gap-3 pt-4">
               <button
                 type="submit"
@@ -291,11 +280,10 @@ const DashboardAdmin = () => {
   const TabButton = ({ id, label, icon: Icon }) => (
     <button
       onClick={() => setActiveTab(id)}
-      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-        activeTab === id
-          ? 'bg-blue-600 text-white'
-          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-      }`}
+      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === id
+        ? 'bg-blue-600 text-white'
+        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        }`}
     >
       <Icon size={18} />
       {label}
@@ -304,7 +292,7 @@ const DashboardAdmin = () => {
 
   const DataTable = () => {
     const data = getFilteredData();
-    
+
     if (loading) {
       return (
         <div className="flex justify-center items-center py-12">
@@ -315,7 +303,7 @@ const DashboardAdmin = () => {
 
     if (data.length === 0) {
       return (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-gray-500 dark:bg-gray-800">
           No {activeTab} found. Create your first one!
         </div>
       );
@@ -324,11 +312,11 @@ const DashboardAdmin = () => {
     const getTableHeaders = () => {
       switch (activeTab) {
         case 'patients':
-          return ['ID', 'Name', 'Email', 'Phone', 'Date of Birth', 'Actions'];
+          return ['ID', 'Name', 'DNI', 'Date of Birth', 'Address', 'Actions'];
         case 'odontologists':
-          return ['ID', 'Name', 'Email', 'Specialty', 'License', 'Actions'];
+          return ['ID', 'Name', 'License', 'Specialty', 'Actions'];
         case 'appointments':
-          return ['ID', 'Patient ID', 'Odontologist ID', 'Date', 'Status', 'Actions'];
+          return ['ID', 'Date', 'Patient ID', 'Odontologist ID', 'Actions'];
         default:
           return [];
       }
@@ -339,45 +327,44 @@ const DashboardAdmin = () => {
         case 'patients':
           return (
             <>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.id}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                {item.firstName} {item.lastName}
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">{item.id}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">
+                {item.name} {item.lastName}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.email}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.phone}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.dateOfBirth}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">{item.dni}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">{item.birthDate}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">{item.address.street} {item.address.number} {item.address.neighborhood}</td>
             </>
           );
         case 'odontologists':
           return (
             <>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.id}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">{item.id}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">
                 {item.firstName} {item.lastName}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.email}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.specialty}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.licenseNumber}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">{item.licenseNumber}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">{item.specialty}</td>
             </>
           );
         case 'appointments':
           return (
             <>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.id}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.patientId}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.odontologistId}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">{item.id}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">
                 {new Date(item.appointmentDate).toLocaleString()}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  item.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">{item.patientId}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">{item.odontologistId}</td>
+
+              {/* <td className="px-6 py-4 whitespace-nowrap">
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${item.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
                   item.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
-                  'bg-yellow-100 text-yellow-800'
-                }`}>
+                    'bg-yellow-100 text-yellow-800'
+                  }`}>
                   {item.status}
                 </span>
-              </td>
+              </td> */}
             </>
           );
         default:
@@ -386,9 +373,9 @@ const DashboardAdmin = () => {
     };
 
     return (
-      <div className="overflow-x-auto ">
+      <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
               {getTableHeaders().map(header => (
                 <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -397,9 +384,9 @@ const DashboardAdmin = () => {
               ))}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 divide-gray-700">
             {data.map(item => (
-              <tr key={item.id} className="hover:bg-gray-50">
+              <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-500">
                 {renderTableRow(item)}
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <button
@@ -422,14 +409,14 @@ const DashboardAdmin = () => {
       </div>
     );
   };
-  
+
   return (
     <div className="container mx-auto p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Dental Clinic Admin</h1>
-          <p className="text-gray-600 mt-2">Manage patients, odontologists, and appointments</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-neutral-400">Dental Clinic Admin</h1>
+          <p className="text-gray-600 mt-2 dark:text-neutral-400">Manage patients, odontologists, and appointments</p>
         </div>
 
         {/* Tabs */}
@@ -440,7 +427,7 @@ const DashboardAdmin = () => {
         </div>
 
         {/* Controls */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-6 dark:bg-gray-800">
           <div className="flex justify-between items-center gap-4">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -449,7 +436,7 @@ const DashboardAdmin = () => {
                 placeholder={`Search ${activeTab}...`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
               />
             </div>
             <button

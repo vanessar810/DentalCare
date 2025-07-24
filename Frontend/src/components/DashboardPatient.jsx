@@ -28,12 +28,12 @@ const DashboardPatient = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await api.get('http://localhost:8080/patient/profile');
+                const response = await api.get('/patient/profile');
                 console.log('data fron api:', response.data)
                 setPatientData(response.data);
                 setFormData(response.data);
                 const patientId = response.data.id;
-                const appointmentsResponse = await api.get('http://localhost:8080/appointment/user',{
+                const appointmentsResponse = await api.get('/appointment/user',{
                     params: {patientId}
                 });
                 console.log('data from appoinments:', appointmentsResponse.data)

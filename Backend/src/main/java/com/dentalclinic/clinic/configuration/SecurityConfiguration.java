@@ -33,20 +33,21 @@ public class SecurityConfiguration {
                             auth.requestMatchers(HttpMethod.GET, "/swagger-ui.html").permitAll();
 
                             // endponints que necesitan algun tipo de rol especifico
-                            auth.requestMatchers(HttpMethod.POST,"/odontologist/**").hasAnyAuthority("ADMIN");
-                            auth.requestMatchers(HttpMethod.PUT,"/odontologist/**").hasAnyAuthority("ADMIN");
-                            auth.requestMatchers(HttpMethod.DELETE,"/odontologist/**").hasAnyAuthority("ADMIN");
-                            auth.requestMatchers(HttpMethod.POST, "/patient/profile").hasAnyAuthority("ADMIN", "USER");
-                            auth.requestMatchers(HttpMethod.GET, "/patient/profile").hasAnyAuthority("ADMIN", "PATIENT");
-                            auth.requestMatchers(HttpMethod.POST,"/patient/**").hasAnyAuthority("ADMIN");
-                            auth.requestMatchers("/patient/**").hasAnyAuthority("ADMIN");
-                            auth.requestMatchers(HttpMethod.GET,"/appointment/user").hasAnyAuthority("PATIENT");
+                            auth.requestMatchers(HttpMethod.POST,"/api/v1/odontologist/**").hasAnyAuthority("ADMIN");
+                            auth.requestMatchers(HttpMethod.PUT,"/api/v1/odontologist/**").hasAnyAuthority("ADMIN");
+                            auth.requestMatchers(HttpMethod.DELETE,"/api/v1/odontologist/**").hasAnyAuthority("ADMIN");
+                            auth.requestMatchers(HttpMethod.POST, "/api/v1/patient/profile").hasAnyAuthority("ADMIN", "USER");
+                            auth.requestMatchers(HttpMethod.GET, "/api/v1/patient/profile").hasAnyAuthority("ADMIN", "PATIENT");
+                            auth.requestMatchers(HttpMethod.POST,"/api/v1/patient/**").hasAnyAuthority("ADMIN");
+                            auth.requestMatchers("/api/v1/patient/**").hasAnyAuthority("ADMIN");
+                            auth.requestMatchers(HttpMethod.GET,"/api/v1/appointment/user").hasAnyAuthority("PATIENT");
 
-                            auth.requestMatchers(HttpMethod.PUT,"/patient/**").hasAnyAuthority("ADMIN");
-                            auth.requestMatchers(HttpMethod.DELETE,"/patient/**").hasAnyAuthority("ADMIN");
+                            auth.requestMatchers(HttpMethod.GET,"/api/v1/patient/**").hasAnyAuthority("ADMIN");
+                            auth.requestMatchers(HttpMethod.PUT,"/api/v1/patient/**").hasAnyAuthority("ADMIN");
+                            auth.requestMatchers(HttpMethod.DELETE,"/api/v1/patient/**").hasAnyAuthority("ADMIN");
 
                             // endpoints que requieren autenticacion basica (tener al menos el rol de user)
-                            auth.requestMatchers("/appointments/**").authenticated();
+                            auth.requestMatchers("/api/v1/appointments/**").authenticated();
                             auth.anyRequest().authenticated();
 
                         })

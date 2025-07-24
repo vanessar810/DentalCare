@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/patient")
+@RequestMapping("/api/v1/patient")
 public class PatientController {
     public IPatientService patientService;
 

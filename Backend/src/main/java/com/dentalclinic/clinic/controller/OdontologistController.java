@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/odontologist")
+@RequestMapping("/api/v1/odontologist")
 public class OdontologistController {
     private IOdontologistService odontologistService;
 

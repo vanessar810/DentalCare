@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
-@RequestMapping("/appointment")
+@RequestMapping("/api/v1/appointment")
 public class AppointmentController {
     private IAppointmentService appointmentService;
 

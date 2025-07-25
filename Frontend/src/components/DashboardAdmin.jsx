@@ -62,8 +62,9 @@ const DashboardAdmin = () => {
       odontologists: '/odontologist',
       appointments: '/appointment'
     };
-
+    console.log(formData)
     const result = await apiCall(endpoints[activeTab], 'POST', formData);
+
     if (result) {
       setShowModal(false);
       loadCurrentTabData();
@@ -164,7 +165,22 @@ const DashboardAdmin = () => {
 
   // Form component
   const FormModal = () => {
-    const [formData, setFormData] = useState(selectedItem || {});
+    const [formData, setFormData] = useState(selectedItem || {
+      dni: '',
+      birthDate: '',
+      address: {
+        street: '',
+        number: '',
+        neighborhood: '',
+      },
+      user: {
+        name: '',
+        lastname: '',
+        email: '',
+        password: '',
+        userRole: '',
+      }
+    });
 
     const handleSubmit = (e) => {
       e.preventDefault();
@@ -176,18 +192,42 @@ const DashboardAdmin = () => {
     };
 
     const handleInputChange = (field, value) => {
-      setFormData(prev => ({ ...prev, [field]: value }));
+      if (field.startsWith('address.')) {
+        const subField = field.split('.')[1];
+        setFormData(prev => ({
+          ...prev,
+          address: {
+            ...prev.address,
+            [subField]: value,
+          },
+        }));
+      } else if (field.startsWith('user.')) {
+        const subField = field.split('.')[1];
+        setFormData(prev => ({
+          ...prev,
+          user: {
+            ...prev.user,
+            [subField]: value,
+          },
+        }));
+      } else
+        setFormData(prev => ({ ...prev, [field]: value }));
     };
 
     const getFormFields = () => {
       switch (activeTab) {
         case 'patients':
           return [
-            { field: 'Name', label: 'Name', type: 'text', required: true },
-            { field: 'lastname', label: 'Last Name', type: 'text', required: true },
+            { field: 'user.name', label: 'Name', type: 'text', required: true },
+            { field: 'user.lastname', label: 'Last Name', type: 'text', required: true },
+            { field: 'user.email', label: 'email', type: 'email', required: true },
+            { field: 'user.password', label: 'password', type: 'password', required: modalMode === 'create' },
+            { field: 'user.userRole', label: 'Role', type: 'select', options: ['PATIENT', 'ADMIN', 'DENTIST'], required: true },
             { field: 'dni', label: 'DNI', type: 'text', required: true },
             { field: 'birthDate', label: 'birthdate', type: 'date', required: true },
-            { field: 'address', label: 'Address', type: 'text', required: false },
+            { field: 'address.street', label: 'street', type: 'text', required: true },
+            { field: 'address.number', label: 'number', type: 'text', required: true },
+            { field: 'address.neighborhood', label: 'neighborhood', type: 'text', required: true },
           ];
         case 'odontologists':
           return [
@@ -231,27 +271,34 @@ const DashboardAdmin = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-neutral-400">
                   {label} {required && <span className="text-red-500">*</span>}
                 </label>
-                {type === 'select' ? (
-                  <select
-                    value={formData[field] || ''}
-                    onChange={(e) => handleInputChange(field, e.target.value)}
-                    required={required}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Select {label}</option>
-                    {options.map(option => (
-                      <option key={option} value={option}>{option}</option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    type={type}
-                    value={formData[field] || ''}
-                    onChange={(e) => handleInputChange(field, e.target.value)}
-                    required={required}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500  dark:bg-gray-800"
-                  />
-                )}
+                {
+                  type === 'select' ? (
+                    <select
+                      value={
+                        field.startsWith('user.') ? formData.user?.[field.split('.')[1]] || '' :
+                          field.startsWith('address.') ? formData.address?.[field.split('.')[1]] || '' :
+                            formData[field] || ''
+                      }
+                      onChange={(e) => handleInputChange(field, e.target.value)}
+                      required={required}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Select {label}</option>
+                      {options.map(option => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type={type}
+                      value={field.startsWith('address.') ? formData.address?.[field.split('.')[1]] || '' : field.startsWith('user.')
+                        ? formData.user?.[field.split('.')[1]] || ''
+                        : formData[field] || ''}
+                      onChange={(e) => handleInputChange(field, e.target.value)}
+                      required={required}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500  dark:bg-gray-800"
+                    />
+                  )}
               </div>
             ))}
 
@@ -329,7 +376,7 @@ const DashboardAdmin = () => {
             <>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">{item.id}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">
-                {item.name} {item.lastName}
+                {item.name} {item.lastname}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">{item.dni}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">{item.birthDate}</td>

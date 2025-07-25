@@ -1,5 +1,6 @@
 package com.dentalclinic.clinic.service;
 
+import com.dentalclinic.clinic.Dto.request.PatientByAdminRequestDTO;
 import com.dentalclinic.clinic.Dto.request.PatientRequestDto;
 import com.dentalclinic.clinic.Dto.response.PatientResponseDto;
 import com.dentalclinic.clinic.entity.Address;
@@ -26,6 +27,7 @@ class PatientServiceTest{
     private Patient patient;
     private PatientResponseDto patientResponseDto;
     private PatientRequestDto patientRequestDto;
+    private PatientByAdminRequestDTO patientByAdminRequestDTO;
     @BeforeEach
     void setUp(){
         patient = new Patient();
@@ -42,7 +44,7 @@ class PatientServiceTest{
     @Test
     @DisplayName("Create patient in DB")
     void testPatientInDB(){
-        PatientResponseDto patientDB = patientService.createPatient(patientRequestDto);
+        PatientResponseDto patientDB = patientService.createPatient(patientByAdminRequestDTO);
         assertNotNull(patientDB);
     }
     @Test

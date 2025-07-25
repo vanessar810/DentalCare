@@ -1,19 +1,20 @@
 package com.dentalclinic.clinic.service;
 
+import com.dentalclinic.clinic.Dto.request.PatientByAdminRequestDTO;
 import com.dentalclinic.clinic.Dto.request.PatientRequestDto;
+import com.dentalclinic.clinic.Dto.request.UserRequestDTO;
 import com.dentalclinic.clinic.Dto.response.AppointmentResponseDto;
 import com.dentalclinic.clinic.Dto.response.OdontologistResponseDto;
 import com.dentalclinic.clinic.Dto.response.PatientResponse2Dto;
 import com.dentalclinic.clinic.Dto.response.PatientResponseDto;
-import com.dentalclinic.clinic.entity.Appointment;
-import com.dentalclinic.clinic.entity.Patient;
-import com.dentalclinic.clinic.entity.User;
-import com.dentalclinic.clinic.entity.UserRole;
+import com.dentalclinic.clinic.configuration.PatientMapper;
+import com.dentalclinic.clinic.entity.*;
 import com.dentalclinic.clinic.exception.ResourceNotFoundException;
 import com.dentalclinic.clinic.repository.IPatientRepository;
 import com.dentalclinic.clinic.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,16 +28,23 @@ public class PatientService implements IPatientService{
     private IPatientRepository patientRepository;
     private IUserRepository userRepository;
     private ModelMapper modelMapper;
+    private PatientMapper patientMapper;
+    private PasswordEncoder passwordEncoder;
 
-    public PatientService(IPatientRepository patientRepository, IUserRepository userRepository, ModelMapper modelMapper) {
+    public PatientService(IPatientRepository patientRepository, IUserRepository userRepository, ModelMapper modelMapper, PatientMapper patientMapper, PasswordEncoder passwordEncoder) {
         this.patientRepository = patientRepository;
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
+        this.patientMapper = patientMapper;
+        this.passwordEncoder = passwordEncoder;
     }
-
-    public PatientResponseDto createPatient(PatientRequestDto patientRequestDto){
-        Patient patient1 = mapToEntity(patientRequestDto);
-        Patient patient2 = patientRepository.save(patient1);
+    public PatientResponseDto createPatient(PatientByAdminRequestDTO patientRequestDto){
+        User user = patientMapper.userDtoToUser(patientRequestDto.getUser());
+        user.setPassword(passwordEncoder.encode(patientRequestDto.getUser().getPassword()));
+        userRepository.save(user);
+        Patient patient = patientMapper.patientDTOtoPatient(patientRequestDto);
+        patient.setUser(user);
+        Patient patient2 = patientRepository.save(patient);
         return mapToResponseDto(patient2);
     }
     @Transactional
@@ -47,14 +55,13 @@ public class PatientService implements IPatientService{
         if (user.getUserRole() == UserRole.PATIENT){
             throw new IllegalStateException("User is already a patient.");
         }
-        Patient patient1 = mapToEntity(patientRequestDto);
+        Patient patient1 = mapToEntity2(patientRequestDto);
         patient1.setUser(user);
         user.setUserRole(UserRole.PATIENT);
         Patient patient2 = patientRepository.save(patient1);
         userRepository.save(user);
         return mapToResponseDto(patient2);
     }
-
 
     public Optional<Patient> readId(Integer id){
         return  patientRepository.findById(id);
@@ -89,9 +96,9 @@ public class PatientService implements IPatientService{
         return mapToResponseDto(patientOptional);
     }
 
-    private Patient mapToEntity(PatientRequestDto patientRequestDto){
-       Patient patient = modelMapper.map(patientRequestDto, Patient.class);
-               patient.setBirthDate(patientRequestDto.getBirthDate());
+    private Patient mapToEntity2(PatientRequestDto patientRequestDto){
+        Patient patient = modelMapper.map(patientRequestDto, Patient.class);
+        patient.setBirthDate(patientRequestDto.getBirthDate());
         return  patient;
 
     }

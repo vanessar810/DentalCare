@@ -1,5 +1,6 @@
 package com.dentalclinic.clinic.controller;
 
+import com.dentalclinic.clinic.Dto.request.PatientByAdminRequestDTO;
 import com.dentalclinic.clinic.Dto.request.PatientRequestDto;
 import com.dentalclinic.clinic.Dto.response.PatientResponse2Dto;
 import com.dentalclinic.clinic.Dto.response.PatientResponseDto;
@@ -28,7 +29,7 @@ public class PatientController {
     // 🛡 Endpoint solo para ADMIN
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<PatientResponseDto> createPatient(@RequestBody PatientRequestDto patient){
+    public ResponseEntity<PatientResponseDto> createPatient(@RequestBody PatientByAdminRequestDTO patient){
         PatientResponseDto patient1 = patientService.createPatient(patient);
         return ResponseEntity.status(HttpStatus.CREATED).body(patient1);
     }

@@ -1,5 +1,6 @@
 package com.dentalclinic.clinic.service;
 
+import com.dentalclinic.clinic.Dto.request.PatientByAdminRequestDTO;
 import com.dentalclinic.clinic.Dto.request.PatientRequestDto;
 import com.dentalclinic.clinic.Dto.response.PatientResponse2Dto;
 import com.dentalclinic.clinic.Dto.response.PatientResponseDto;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IPatientService {
-     PatientResponseDto createPatient(PatientRequestDto patientRequestDto);
+     PatientResponseDto createPatient(PatientByAdminRequestDTO patientRequestDto);
      Optional<Patient> readId(Integer id);
      List<Patient> readAll();
      void update(Patient patient);

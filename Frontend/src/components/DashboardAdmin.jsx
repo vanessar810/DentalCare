@@ -165,22 +165,59 @@ const DashboardAdmin = () => {
 
   // Form component
   const FormModal = () => {
-    const [formData, setFormData] = useState(selectedItem || {
-      dni: '',
-      birthDate: '',
-      address: {
-        street: '',
-        number: '',
-        neighborhood: '',
-      },
-      user: {
-        name: '',
-        lastname: '',
-        email: '',
-        password: '',
-        userRole: '',
+    const getInitialFormData = () => {
+      switch (activeTab) {
+        case 'patients':
+          return {
+            dni: '',
+            birthDate: '',
+            address: {
+              street: '',
+              number: '',
+              neighborhood: '',
+            },
+            user: {
+              name: '',
+              lastname: '',
+              email: '',
+              password: '',
+              userRole: '',
+            }
+          };
+        case 'odontologists':
+          return {
+            phone: '',
+            license: '',
+            user: {
+              name: '',
+              lastname: '',
+              email: '',
+              password: '',
+              userRole: '',
+            }
+          };
+        case 'appointments':
+          return {
+            patientId: '',
+            odontologistId: '',
+            appointmentDate: '',
+            description: '',
+            status: 'SCHEDULED'
+          };
+        default:
+          return {};
       }
-    });
+    };
+
+    const [formData, setFormData] = useState(selectedItem || getInitialFormData());
+
+    useEffect(() => {
+      if (modalMode === 'create') {
+        setFormData(getInitialFormData());
+      } else if (selectedItem) {
+        setFormData(selectedItem);
+      }
+    }, [modalMode, selectedItem, activeTab]);
 
     const handleSubmit = (e) => {
       e.preventDefault();
@@ -231,12 +268,13 @@ const DashboardAdmin = () => {
           ];
         case 'odontologists':
           return [
-            { field: 'firstName', label: 'First Name', type: 'text', required: true },
-            { field: 'lastName', label: 'Last Name', type: 'text', required: true },
-            { field: 'email', label: 'Email', type: 'email', required: true },
-            { field: 'phone', label: 'Phone', type: 'tel', required: true },
-            { field: 'specialty', label: 'Specialty', type: 'text', required: true },
-            { field: 'licenseNumber', label: 'License Number', type: 'text', required: true },
+            { field: 'user.name', label: 'Name', type: 'text', required: true },
+            { field: 'user.lastname', label: 'Last Name', type: 'text', required: true },
+            { field: 'user.email', label: 'email', type: 'email', required: true },
+            { field: 'user.password', label: 'password', type: 'password', required: modalMode === 'create' },
+            { field: 'user.userRole', label: 'Role', type: 'select', options: ['PATIENT', 'ADMIN', 'DENTIST'], required: true },
+            { field: 'phone', label: 'phone', type: 'text', required: true },
+            { field: 'license', label: 'License', type: 'text', required: true },
           ];
         case 'appointments':
           return [
@@ -388,9 +426,9 @@ const DashboardAdmin = () => {
             <>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">{item.id}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">
-                {item.firstName} {item.lastName}
+                {item.name} {item.lastname}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">{item.licenseNumber}</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">{item.license}</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-neutral-400">{item.specialty}</td>
             </>
           );

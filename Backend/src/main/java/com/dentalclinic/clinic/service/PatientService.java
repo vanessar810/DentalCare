@@ -1,24 +1,20 @@
 package com.dentalclinic.clinic.service;
 
-import com.dentalclinic.clinic.Dto.request.PatientByAdminRequestDTO;
-import com.dentalclinic.clinic.Dto.request.PatientRequestDto;
-import com.dentalclinic.clinic.Dto.request.UserRequestDTO;
-import com.dentalclinic.clinic.Dto.response.AppointmentResponseDto;
-import com.dentalclinic.clinic.Dto.response.OdontologistResponseDto;
-import com.dentalclinic.clinic.Dto.response.PatientResponse2Dto;
-import com.dentalclinic.clinic.Dto.response.PatientResponseDto;
+import com.dentalclinic.clinic.configuration.UserMapper;
+import com.dentalclinic.clinic.dto.request.PatientByAdminRequestDTO;
+import com.dentalclinic.clinic.dto.request.PatientRequestDto;
+import com.dentalclinic.clinic.dto.response.PatientResponse2Dto;
+import com.dentalclinic.clinic.dto.response.PatientResponseDto;
 import com.dentalclinic.clinic.configuration.PatientMapper;
 import com.dentalclinic.clinic.entity.*;
 import com.dentalclinic.clinic.exception.ResourceNotFoundException;
 import com.dentalclinic.clinic.repository.IPatientRepository;
 import com.dentalclinic.clinic.repository.IUserRepository;
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.plaf.PanelUI;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,23 +25,26 @@ public class PatientService implements IPatientService{
     private IUserRepository userRepository;
     private ModelMapper modelMapper;
     private PatientMapper patientMapper;
+    private final UserMapper userMapper;
     private PasswordEncoder passwordEncoder;
 
-    public PatientService(IPatientRepository patientRepository, IUserRepository userRepository, ModelMapper modelMapper, PatientMapper patientMapper, PasswordEncoder passwordEncoder) {
+    public PatientService(IPatientRepository patientRepository, IUserRepository userRepository, ModelMapper modelMapper, PatientMapper patientMapper, UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.patientRepository = patientRepository;
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.patientMapper = patientMapper;
+        this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
     }
+
     public PatientResponseDto createPatient(PatientByAdminRequestDTO patientRequestDto){
-        User user = patientMapper.userDtoToUser(patientRequestDto.getUser());
+        User user = userMapper.userDtoToUser(patientRequestDto.getUser());
         user.setPassword(passwordEncoder.encode(patientRequestDto.getUser().getPassword()));
         userRepository.save(user);
         Patient patient = patientMapper.patientDTOtoPatient(patientRequestDto);
         patient.setUser(user);
         Patient patient2 = patientRepository.save(patient);
-        return mapToResponseDto(patient2);
+        return patientMapper.patientToPatientResponseDTOto(patient2);
     }
     @Transactional
     public PatientResponseDto createPatientProfile(PatientRequestDto patientRequestDto, String email){

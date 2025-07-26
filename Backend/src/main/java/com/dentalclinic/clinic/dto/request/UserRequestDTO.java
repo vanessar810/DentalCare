@@ -1,4 +1,4 @@
-package com.dentalclinic.clinic.Dto.request;
+package com.dentalclinic.clinic.dto.request;
 
 import lombok.*;
 
@@ -13,4 +13,5 @@ public class UserRequestDTO {
     private String email;
     private String password;
     private String userRole;
+
 }

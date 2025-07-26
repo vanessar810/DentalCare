@@ -1,6 +1,6 @@
 package com.dentalclinic.clinic.auth;
 
-import com.dentalclinic.clinic.Dto.response.MeResponseDTO;
+import com.dentalclinic.clinic.dto.response.MeResponseDTO;
 import com.dentalclinic.clinic.configuration.JwtService;
 import com.dentalclinic.clinic.entity.User;
 import com.dentalclinic.clinic.entity.UserRole;

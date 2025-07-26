@@ -1,12 +1,12 @@
 package com.dentalclinic.clinic.controller;
 
+import com.dentalclinic.clinic.dto.request.OdontologistRequestDTO;
+import com.dentalclinic.clinic.dto.response.OdontologistResponseDto;
 import com.dentalclinic.clinic.entity.Odontologist;
 import com.dentalclinic.clinic.exception.ResourceNotFoundException;
 import com.dentalclinic.clinic.service.IOdontologistService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,8 +22,8 @@ public class OdontologistController {
     }
 
     @PostMapping
-    public ResponseEntity<Odontologist> createOdontologist(@RequestBody Odontologist odontologist) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(odontologistService.createOdontologist(odontologist));
+    public ResponseEntity<OdontologistResponseDto> createOdontologist(@RequestBody OdontologistRequestDTO odontologistRequestDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(odontologistService.createOdontologist(odontologistRequestDTO));
     }
 
     @PutMapping

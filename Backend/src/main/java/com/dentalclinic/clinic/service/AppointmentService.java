@@ -1,9 +1,9 @@
 package com.dentalclinic.clinic.service;
 
-import com.dentalclinic.clinic.Dto.request.AppointmentRequestDto;
-import com.dentalclinic.clinic.Dto.response.AppointmentResponseDto;
-import com.dentalclinic.clinic.Dto.response.OdontologistResponseDto;
-import com.dentalclinic.clinic.Dto.response.PatientResponseDto;
+import com.dentalclinic.clinic.dto.request.AppointmentRequestDto;
+import com.dentalclinic.clinic.dto.response.AppointmentResponseDto;
+import com.dentalclinic.clinic.dto.response.OdontologistResponseDto;
+import com.dentalclinic.clinic.dto.response.PatientResponseDto;
 import com.dentalclinic.clinic.entity.Appointment;
 import com.dentalclinic.clinic.entity.Odontologist;
 import com.dentalclinic.clinic.entity.Patient;

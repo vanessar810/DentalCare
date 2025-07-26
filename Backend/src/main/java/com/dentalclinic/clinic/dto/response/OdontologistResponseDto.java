@@ -1,4 +1,4 @@
-package com.dentalclinic.clinic.Dto.response;
+package com.dentalclinic.clinic.dto.response;
 
 import lombok.*;
 
@@ -12,4 +12,6 @@ public class OdontologistResponseDto {
     private String name;
     private String lastname;
     private String license;
+    private String email;
+    private String phone;
 }

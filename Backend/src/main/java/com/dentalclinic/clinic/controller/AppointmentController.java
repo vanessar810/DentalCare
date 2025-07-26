@@ -1,7 +1,7 @@
 package com.dentalclinic.clinic.controller;
 
-import com.dentalclinic.clinic.Dto.request.AppointmentRequestDto;
-import com.dentalclinic.clinic.Dto.response.AppointmentResponseDto;
+import com.dentalclinic.clinic.dto.request.AppointmentRequestDto;
+import com.dentalclinic.clinic.dto.response.AppointmentResponseDto;
 import com.dentalclinic.clinic.exception.ResourceNotFoundException;
 import com.dentalclinic.clinic.service.IAppointmentService;
 import org.springframework.http.HttpStatus;

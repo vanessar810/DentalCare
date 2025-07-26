@@ -1,9 +1,16 @@
 package com.dentalclinic.clinic.service;
 
+import com.dentalclinic.clinic.dto.request.OdontologistRequestDTO;
+import com.dentalclinic.clinic.dto.response.OdontologistResponseDto;
+import com.dentalclinic.clinic.configuration.OdontologistMapper;
+import com.dentalclinic.clinic.configuration.UserMapper;
 import com.dentalclinic.clinic.entity.Odontologist;
 import com.dentalclinic.clinic.entity.Speciality;
+import com.dentalclinic.clinic.entity.User;
 import com.dentalclinic.clinic.exception.ResourceNotFoundException;
 import com.dentalclinic.clinic.repository.IOdontologistRepository;
+import com.dentalclinic.clinic.repository.IUserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,16 +19,30 @@ import java.util.Optional;
 @Service
 public class OdontologistService implements IOdontologistService{
     private IOdontologistRepository odontologistRepository;
+    private IUserRepository userRepository;
     private ISpecialityService specialityService;
+    private OdontologistMapper odontologistMapper;
+    private UserMapper userMapper;
+    private PasswordEncoder passwordEncoder;
 
-    public OdontologistService(IOdontologistRepository odontologistRepository, ISpecialityService specialityService) {
+    public OdontologistService(IOdontologistRepository odontologistRepository, IUserRepository userRepository, ISpecialityService specialityService, OdontologistMapper odontologistMapper, UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.odontologistRepository = odontologistRepository;
+        this.userRepository = userRepository;
         this.specialityService = specialityService;
+        this.odontologistMapper = odontologistMapper;
+        this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    public Odontologist createOdontologist(Odontologist odontologist) {
-
-        return odontologistRepository.save(odontologist);
+    public OdontologistResponseDto createOdontologist(OdontologistRequestDTO odontologistRequestDTO) {
+        User user = userMapper.userDtoToUser(odontologistRequestDTO.getUser());
+        user.setPassword(passwordEncoder.encode(odontologistRequestDTO.getUser().getPassword()));
+        userRepository.save(user);
+        Odontologist odontologist = odontologistMapper.odontologistDTOtoOdontologist(odontologistRequestDTO);
+        odontologist.setUser(user);
+        Odontologist odontologist1 = odontologistRepository.save(odontologist);
+        OdontologistResponseDto odontologistResponseDto = odontologistMapper.odontologistToResponseDTO(odontologist1);
+        return odontologistResponseDto;
     }
     public Optional<Odontologist> readId(Integer id) throws ResourceNotFoundException {
         Optional<Odontologist> odontologist = odontologistRepository.findById(id);

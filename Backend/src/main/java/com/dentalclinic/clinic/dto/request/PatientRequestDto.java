@@ -1,4 +1,4 @@
-package com.dentalclinic.clinic.Dto.request;
+package com.dentalclinic.clinic.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;

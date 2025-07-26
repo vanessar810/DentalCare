@@ -1,8 +1,7 @@
 package com.dentalclinic.clinic.auth;
 
-import com.dentalclinic.clinic.Dto.response.MeResponseDTO;
+import com.dentalclinic.clinic.dto.response.MeResponseDTO;
 import com.dentalclinic.clinic.entity.User;
-import com.dentalclinic.clinic.repository.IPatientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

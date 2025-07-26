@@ -1,9 +1,9 @@
 package com.dentalclinic.clinic.service;
 
-import com.dentalclinic.clinic.Dto.request.PatientByAdminRequestDTO;
-import com.dentalclinic.clinic.Dto.request.PatientRequestDto;
-import com.dentalclinic.clinic.Dto.response.PatientResponse2Dto;
-import com.dentalclinic.clinic.Dto.response.PatientResponseDto;
+import com.dentalclinic.clinic.dto.request.PatientByAdminRequestDTO;
+import com.dentalclinic.clinic.dto.request.PatientRequestDto;
+import com.dentalclinic.clinic.dto.response.PatientResponse2Dto;
+import com.dentalclinic.clinic.dto.response.PatientResponseDto;
 import com.dentalclinic.clinic.entity.Patient;
 import com.dentalclinic.clinic.entity.User;
 import com.dentalclinic.clinic.exception.ResourceNotFoundException;

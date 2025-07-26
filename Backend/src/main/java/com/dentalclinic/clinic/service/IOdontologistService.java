@@ -1,5 +1,7 @@
 package com.dentalclinic.clinic.service;
 
+import com.dentalclinic.clinic.dto.request.OdontologistRequestDTO;
+import com.dentalclinic.clinic.dto.response.OdontologistResponseDto;
 import com.dentalclinic.clinic.entity.Odontologist;
 import com.dentalclinic.clinic.exception.ResourceNotFoundException;
 
@@ -7,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IOdontologistService {
-    Odontologist createOdontologist(Odontologist odontologist);
+    OdontologistResponseDto createOdontologist(OdontologistRequestDTO odontologistRequestDTO);
     Optional<Odontologist> readId(Integer id) throws ResourceNotFoundException;
     List<Odontologist> readAll();
     void update(Odontologist odontologist) throws ResourceNotFoundException;

@@ -1,4 +1,4 @@
-package com.dentalclinic.clinic.Dto.response;
+package com.dentalclinic.clinic.dto.response;
 
 import com.dentalclinic.clinic.entity.Address;
 import lombok.*;

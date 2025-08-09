@@ -3,6 +3,8 @@ package com.dentalclinic.clinic.service;
 import com.dentalclinic.clinic.configuration.UserMapper;
 import com.dentalclinic.clinic.dto.request.PatientByAdminRequestDTO;
 import com.dentalclinic.clinic.dto.request.PatientRequestDto;
+import com.dentalclinic.clinic.dto.request.PatientRequestUpdateByAdminDTO;
+import com.dentalclinic.clinic.dto.request.PatientRequestUpdateByPatientDTO;
 import com.dentalclinic.clinic.dto.response.PatientResponse2Dto;
 import com.dentalclinic.clinic.dto.response.PatientResponseDto;
 import com.dentalclinic.clinic.configuration.PatientMapper;
@@ -36,7 +38,7 @@ public class PatientService implements IPatientService{
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
     }
-
+    //create patient as Admin
     public PatientResponseDto createPatient(PatientByAdminRequestDTO patientRequestDto){
         User user = userMapper.userDtoToUser(patientRequestDto.getUser());
         user.setPassword(passwordEncoder.encode(patientRequestDto.getUser().getPassword()));
@@ -46,6 +48,7 @@ public class PatientService implements IPatientService{
         Patient patient2 = patientRepository.save(patient);
         return patientMapper.patientToPatientResponseDTOto(patient2);
     }
+    //create patient completing patient form
     @Transactional
     public PatientResponseDto createPatientProfile(PatientRequestDto patientRequestDto, String email){
         System.out.println("fecha de nacimiento: "+ patientRequestDto.getBirthDate());
@@ -65,13 +68,28 @@ public class PatientService implements IPatientService{
     public Optional<Patient> readId(Integer id){
         return  patientRepository.findById(id);
     }
-    public List<Patient> readAll(){
-        return patientRepository.findAll();
+    @Override
+    public List<PatientResponseDto> readAll(){
+
+        return patientMapper.patientsToPatientResponseDtos(patientRepository.findAll());
     }
 
     @Override
-    public void update(Patient patient) {
-        patientRepository.save(patient);
+    public PatientResponseDto updateByPatient(User user, PatientRequestUpdateByPatientDTO patientDto) {
+        userRepository.findByEmail(user.getEmail()).orElseThrow(()-> new RuntimeException("user not found"));
+        Patient existingPatient = patientRepository.findByUser(user).orElseThrow(()-> new RuntimeException("Patient not found"));
+        patientMapper.updatePatientFromDto(patientDto, existingPatient);
+        Patient savedPatient = patientRepository.save(existingPatient);
+        return patientMapper.patientToPatientResponseDTOto(savedPatient);
+    }
+
+    @Override
+    public PatientResponseDto updateByAdmin(Integer id, PatientRequestUpdateByAdminDTO patientDto) {
+        Patient existingPatient = patientRepository.findById(id)
+                .orElseThrow(()-> new RuntimeException("Patient not found"));
+        patientMapper.updatePatientFromDto(patientDto, existingPatient);
+        Patient savedPatient = patientRepository.save(existingPatient);
+        return patientMapper.patientToPatientResponseDTOto(savedPatient);
     }
 
     @Override

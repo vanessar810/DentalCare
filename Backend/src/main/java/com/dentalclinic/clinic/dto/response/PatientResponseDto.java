@@ -1,5 +1,6 @@
 package com.dentalclinic.clinic.dto.response;
 
+import com.dentalclinic.clinic.dto.request.AddressDto;
 import com.dentalclinic.clinic.entity.Address;
 import lombok.*;
 
@@ -16,5 +17,8 @@ public class PatientResponseDto {
     private String lastname;
     private String dni;
     private LocalDate birthDate;
-    private Address address;
+    private AddressDto address;
+    private String email;
+    private String role;
+
 }

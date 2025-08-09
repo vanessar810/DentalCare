@@ -10,6 +10,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+//To create patient from patient role
 public class PatientRequestDto {
     private String name;
     private String lastname;

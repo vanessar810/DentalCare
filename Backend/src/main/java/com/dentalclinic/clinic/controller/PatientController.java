@@ -2,6 +2,8 @@ package com.dentalclinic.clinic.controller;
 
 import com.dentalclinic.clinic.dto.request.PatientByAdminRequestDTO;
 import com.dentalclinic.clinic.dto.request.PatientRequestDto;
+import com.dentalclinic.clinic.dto.request.PatientRequestUpdateByAdminDTO;
+import com.dentalclinic.clinic.dto.request.PatientRequestUpdateByPatientDTO;
 import com.dentalclinic.clinic.dto.response.PatientResponse2Dto;
 import com.dentalclinic.clinic.dto.response.PatientResponseDto;
 import com.dentalclinic.clinic.entity.Patient;
@@ -42,11 +44,12 @@ public class PatientController {
         return ResponseEntity.status(HttpStatus.CREATED).body(patientResponseDto);
     }
 
-
+    //returns a list of patients
     @GetMapping
-    public ResponseEntity<List<Patient>> readAll(){
+    public ResponseEntity<List<PatientResponseDto>> readAll(){
          return ResponseEntity.ok(patientService.readAll());
     }
+    //return a patient by an id
     @GetMapping("/{id}")
     public ResponseEntity<Patient> readById(@PathVariable Integer id){
         Optional<Patient> patient = patientService.readId(id);
@@ -57,30 +60,37 @@ public class PatientController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
-    @PutMapping
-    public ResponseEntity<String> updatePatient(@RequestBody Patient patient){
-       Optional<Patient> patient1 = patientService.readId(patient.getId());
-       if (patient1.isPresent()){
-           patientService.update(patient);
-           return ResponseEntity.ok("{\"message\":\"patient updated\"}");
-       } else {
-           return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-       }
+    //returns information about the user/patient authenticated without id
+    @GetMapping("/me")
+    public ResponseEntity<PatientResponse2Dto> getMyInfo(@AuthenticationPrincipal User user) throws ResourceNotFoundException {
+        PatientResponse2Dto patientResponse2Dto = patientService.getPatientInfo(user);
+        return ResponseEntity.ok(patientResponse2Dto);
+    }
+    //returns information about the user/patient authenticated with id
+    @GetMapping("/profile")
+    public ResponseEntity<PatientResponseDto> getProfile(@AuthenticationPrincipal User user) throws ResourceNotFoundException {
+        PatientResponseDto patientResponseDto = patientService.getProfile(user);
+        return ResponseEntity.ok(patientResponseDto);
+    }
+    //update patient from patient
+    @PutMapping("me")
+    public ResponseEntity<PatientResponseDto> updatePatient(
+            @RequestBody PatientRequestUpdateByPatientDTO patient,
+            @AuthenticationPrincipal User user){
+       PatientResponseDto patient1 = patientService.updateByPatient(user,patient);
+       return ResponseEntity.ok(patient1);
+    }
+    //update patient from Admin
+    @PutMapping("/{id}")
+    public ResponseEntity<PatientResponseDto> updatePatient(
+            @PathVariable Integer id,
+            @RequestBody PatientRequestUpdateByAdminDTO patient){
+       PatientResponseDto patient1 = patientService.updateByAdmin(id, patient);
+       return ResponseEntity.ok(patient1);
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deletePatient(@PathVariable Integer id) throws ResourceNotFoundException {
             patientService.delete(id);
             return ResponseEntity.ok("{\"message\":\"patient deleted\"}");
     }
-    @GetMapping("/me")
-    public ResponseEntity<PatientResponse2Dto> getMyInfo(@AuthenticationPrincipal User user) throws ResourceNotFoundException {
-        PatientResponse2Dto patientResponse2Dto = patientService.getPatientInfo(user);
-        return ResponseEntity.ok(patientResponse2Dto);
-    }
-    @GetMapping("/profile")
-    public ResponseEntity<PatientResponseDto> getProfile(@AuthenticationPrincipal User user) throws ResourceNotFoundException {
-        PatientResponseDto patientResponseDto = patientService.getProfile(user);
-        return ResponseEntity.ok(patientResponseDto);
-    }
-
 }

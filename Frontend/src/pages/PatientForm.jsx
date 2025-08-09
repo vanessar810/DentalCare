@@ -1,7 +1,7 @@
 import React from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import api from '../lib/api';
+import api from '../services/api';
 import { useAuth } from '../providers/AuthProvider';
 
 const PatientForm = () => {

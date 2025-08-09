@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../lib/api';
+import api from '../services/api';
 import { useAuth } from '../providers/AuthProvider';
 import { User2, Calendar, Settings, Clock, FileText, ChevronRight, Bell, Edit } from 'lucide-react';
 
@@ -29,7 +29,7 @@ const DashboardPatient = () => {
         const fetchData = async () => {
             try {
                 const response = await api.get('/patient/profile');
-                console.log('data fron api:', response.data)
+                console.log('data from api:', response.data)
                 setPatientData(response.data);
                 setFormData(response.data);
                 const patientId = response.data.id;

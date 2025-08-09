@@ -1,16 +1,15 @@
 import { Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
-import Home from './components/Home';
-import Register from './components/Register';
-import Appointments from './components/Appointments';
-import Services from './components/Services';
-import Login from './components/Login';
-import Patient from './components/Patient';
-import PatientForm from './components/PatientForm';
+import Home from './pages/Home';
+import Register from './pages/Register';
+import Appointments from './pages/Appointments';
+import Services from './pages/Services';
+import Login from './pages/Login';
+import PatientForm from './pages/PatientForm';
 import PrivateRoute from './components/PrivateRoute';
 import './App.css'
-import DashboardPatient from './components/DashboardPatient';
-import DashboardAdmin from './components/DashboardAdmin';
+import DashboardPatient from './pages/DashboardPatient';
+import DashboardAdmin from './pages/DashboardAdmin';
 function App() {
   return (
     <Routes>
@@ -19,7 +18,6 @@ function App() {
         <Route path="login" element={<Login />} />
         <Route path="services" element={<Services />} />
         <Route path="register" element={<Register />} />
-        <Route path="patient" element={ <Patient />} />
         <Route path="patientForm" element={ <PatientForm />} />
         <Route path="appointments" element={<PrivateRoute> <Appointments /></PrivateRoute>} />
         <Route path="dashboardPatient" element={<PrivateRoute> <DashboardPatient /></PrivateRoute>} />

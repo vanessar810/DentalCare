@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
-import api from '../lib/api';
+import api from '../services/api';
 import { validateForm } from '../utils/formValidator';
 import { createHandleChange } from '../utils/handleChange';
 import { useAuth } from '../providers/AuthProvider';

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Users, UserCheck, Calendar, Search, Save, X } from 'lucide-react';
-import api from '../lib/api';
+import api from '../services/api';
 
-const DashboardAdmin = () => {
+export const DentalDashboardAdmin = () => {
   const [activeTab, setActiveTab] = useState('patients');
   const [patients, setPatients] = useState([]);
   const [odontologists, setOdontologists] = useState([]);
@@ -79,6 +79,7 @@ const DashboardAdmin = () => {
     };
 
     const result = await apiCall(endpoints[activeTab], 'PUT', formData);
+    console.log(formData);
     if (result) {
       setShowModal(false);
       loadCurrentTabData();
@@ -546,4 +547,3 @@ const DashboardAdmin = () => {
   );
 };
 
-export default DashboardAdmin;

@@ -14,13 +14,23 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IPatientService {
-     PatientResponseDto createPatient(PatientByAdminRequestDTO patientRequestDto);
-     Optional<Patient> readId(Integer id);
-     List<PatientResponseDto> readAll();
+    PatientResponseDto createPatient(PatientByAdminRequestDTO patientRequestDto);
+
+    PatientResponseDto readId(Integer id);
+
+    Patient findEntityById(Integer id);
+
+    List<PatientResponseDto> readAll();
+
     PatientResponseDto updateByPatient(User user, PatientRequestUpdateByPatientDTO patientDto);
+
     PatientResponseDto updateByAdmin(Integer id, PatientRequestUpdateByAdminDTO patientDto);
-     void delete(Integer id) throws ResourceNotFoundException;
-     PatientResponseDto createPatientProfile(PatientRequestDto patientRequestDto, String email);
-     PatientResponse2Dto getPatientInfo(User user) throws ResourceNotFoundException;
-     PatientResponseDto getProfile(User user) throws ResourceNotFoundException;
+
+    void delete(Integer id) throws ResourceNotFoundException;
+
+    PatientResponseDto createPatientProfile(PatientRequestDto patientRequestDto, String email);
+
+    PatientResponse2Dto getPatientInfo(User user) throws ResourceNotFoundException;
+
+    PatientResponseDto getProfile(User user) throws ResourceNotFoundException;
 }

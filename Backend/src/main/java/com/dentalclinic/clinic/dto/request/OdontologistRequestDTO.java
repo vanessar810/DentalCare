@@ -12,7 +12,8 @@ public class OdontologistRequestDTO {
     private String name;
     private String lastname;
     private String license;
-    private String email;
     private String phone;
+    private String email;
     private UserRequestDTO user;
+    private String role;
 }

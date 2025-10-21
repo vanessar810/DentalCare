@@ -10,6 +10,7 @@ import com.dentalclinic.clinic.entity.User;
 import com.dentalclinic.clinic.exception.ResourceNotFoundException;
 import com.dentalclinic.clinic.repository.IOdontologistRepository;
 import com.dentalclinic.clinic.repository.IUserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class OdontologistService implements IOdontologistService{
     private IOdontologistRepository odontologistRepository;
     private IUserRepository userRepository;
@@ -44,57 +46,56 @@ public class OdontologistService implements IOdontologistService{
         OdontologistResponseDto odontologistResponseDto = odontologistMapper.odontologistToResponseDTO(odontologist1);
         return odontologistResponseDto;
     }
-    public Optional<Odontologist> readId(Integer id) throws ResourceNotFoundException {
-        Optional<Odontologist> odontologist = odontologistRepository.findById(id);
-        if (odontologist.isEmpty()) throw new ResourceNotFoundException("{\"message\":\"odontologist not found\"}");
-            return odontologist;
+    public OdontologistResponseDto readId(Integer id) {
+        Odontologist odontologist = odontologistRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("id not found"+id));
+            return odontologistMapper.odontologistToResponseDTO(odontologist);
     }
 
-    public List<Odontologist> readAll() {
-
-        return odontologistRepository.findAll();
-    }
-
-    @Override
-    public void update(Odontologist odontologist) throws ResourceNotFoundException {
-        Optional<Odontologist> odontologist1 = odontologistRepository.findById(odontologist.getId());
-        odontologistRepository.save(odontologist);
-        if (odontologist1.isEmpty()) {
-            throw new ResourceNotFoundException("{\"message\":\"odontologist not found\"}");
-        }
+    public List<OdontologistResponseDto> readAll() {
+        return odontologistMapper.odontologistsToOdontologistResponseDtos(odontologistRepository.findAll());
     }
 
     @Override
-    public void delete(Integer id) throws ResourceNotFoundException {
-        Optional<Odontologist> odontologistOptional = readId(id);
-        if(odontologistOptional.isPresent()) {
-            odontologistRepository.deleteById(id);
-        }
-        else
-            throw new ResourceNotFoundException("{\"message\":\"odontologist not found\"}");
+    public OdontologistResponseDto update(Integer id, OdontologistRequestDTO odontologistDto){
+        Odontologist existingOdontologist1 = odontologistRepository.findById(id)
+                        .orElseThrow(()-> new ResourceNotFoundException("Odontologist not found "+id));
+        odontologistMapper.updateOdontologistFromDTO(odontologistDto, existingOdontologist1);
+        Odontologist savedOdontologist = odontologistRepository.save(existingOdontologist1);
+        return odontologistMapper.odontologistToResponseDTO(savedOdontologist);
     }
 
     @Override
-    public List<Odontologist> searchByLastname(String lastname)  throws ResourceNotFoundException{
+    public void delete(Integer id) {
+        Odontologist odontologist = odontologistRepository.findById(id)
+            .orElseThrow(()->new ResourceNotFoundException("odontologist not found with id:"+id));
+        odontologistRepository.delete(odontologist);
+        log.info("odontologist with id {} has been delated successfully", id);
+    }
+
+    @Override
+    public List<OdontologistResponseDto> searchByLastname(String lastname) {
         List<Odontologist> odontologists = odontologistRepository.searchByLastname(lastname);
-        if (odontologists.isEmpty()) throw new ResourceNotFoundException("{\"message\":\"odontologist lastname not found\"}");
-        return odontologists;
+        if (odontologists.isEmpty()) throw new ResourceNotFoundException("{\"message\":\"odontologist lastname not found: \"}"+ lastname);
+        return odontologistMapper.odontologistsToOdontologistResponseDtos(odontologists);
 
     }
     @Override
-    public List<Odontologist> findByNameLike(String name){
-        return odontologistRepository.findByNameLike(name);
+    public List<OdontologistResponseDto> findByNameLike(String name){
+        List<Odontologist> odontologists = odontologistRepository.findByNameLike(name);
+        if (odontologists.isEmpty()) throw new ResourceNotFoundException("{\"message\":\"odontologist name not found: \"}"+ name);
+        return odontologistMapper.odontologistsToOdontologistResponseDtos(odontologists);
     }
     //Add speciality
-   public Odontologist addSpeciality(Integer id_odontologist, Integer id_speciality) throws ResourceNotFoundException {
-        Optional<Odontologist> optionalOdontologist = readId(id_odontologist);
-        if(optionalOdontologist.isEmpty()) throw new ResourceNotFoundException("{\"message\":\"odontologist not found\"}");
+   public OdontologistResponseDto addSpeciality(Integer id_odontologist, Integer id_speciality) throws ResourceNotFoundException {
+       Odontologist odontologist = odontologistRepository.findById(id_odontologist)
+               .orElseThrow(()->new ResourceNotFoundException("{\"message\":\"odontologist not found\"}"));
         Optional<Speciality> optionalSpeciality = specialityService.readId(id_speciality);
         if(optionalSpeciality.isEmpty()) throw new ResourceNotFoundException(("{\"message\":\"speciality not found\"}"));
-        Odontologist odontologist = optionalOdontologist.get();
         odontologist.getSpecialities().add(optionalSpeciality.get());
-        update(odontologist);
-        return odontologist;
+        odontologistRepository.save(odontologist);
+        OdontologistResponseDto odontologist1 = odontologistMapper.odontologistToResponseDTO(odontologist);
+        return odontologist1;
         }
 
 }

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,7 +17,7 @@ public class Appointment {
     @Id
             @GeneratedValue(strategy = GenerationType.IDENTITY)
      Integer id;
-     LocalDate date;
+    LocalDateTime date;
     @ManyToOne
      Patient patient;
     @ManyToOne

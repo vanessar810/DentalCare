@@ -4,6 +4,7 @@ import com.dentalclinic.clinic.dto.request.AppointmentRequestDto;
 import com.dentalclinic.clinic.dto.response.AppointmentResponseDto;
 import com.dentalclinic.clinic.exception.ResourceNotFoundException;
 import com.dentalclinic.clinic.service.IAppointmentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/appointment")
+@Slf4j
 public class AppointmentController {
     private IAppointmentService appointmentService;
 
@@ -24,12 +26,18 @@ public class AppointmentController {
     @PostMapping
     public ResponseEntity<AppointmentResponseDto> createAppointment(@RequestBody AppointmentRequestDto appointment){
         AppointmentResponseDto appointment1 = appointmentService.create(appointment);
+        System.out.println("Patient ID recibido: " + appointment.getPatient_id());
+        System.out.println("Odontologist ID recibido: " + appointment.getOdontologist_id());
+        System.out.println("Date recibido: " + appointment.getDate());
+        System.out.println("========================");
         if (appointment1 == null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } else {
             return ResponseEntity.status(HttpStatus.CREATED).body(appointment1);
         }
     }
+
+
     @GetMapping
     public ResponseEntity<List<AppointmentResponseDto>> readAllAppointments(){
         return ResponseEntity.ok(appointmentService.readAll());

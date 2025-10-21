@@ -10,13 +10,13 @@ import java.util.Optional;
 
 public interface IOdontologistService {
     OdontologistResponseDto createOdontologist(OdontologistRequestDTO odontologistRequestDTO);
-    Optional<Odontologist> readId(Integer id) throws ResourceNotFoundException;
-    List<Odontologist> readAll();
-    void update(Odontologist odontologist) throws ResourceNotFoundException;
+    OdontologistResponseDto readId(Integer id);
+    List<OdontologistResponseDto> readAll();
+    OdontologistResponseDto update(Integer id, OdontologistRequestDTO odontologist);
     void delete(Integer id) throws ResourceNotFoundException;
     // HQL methods
-    List<Odontologist> searchByLastname (String lastname) throws ResourceNotFoundException;
-    List<Odontologist> findByNameLike (String name);
+    List<OdontologistResponseDto> searchByLastname (String lastname) throws ResourceNotFoundException;
+    List<OdontologistResponseDto> findByNameLike (String name);
 
-    Odontologist addSpeciality(Integer idOdontologist, Integer idSpeciality) throws ResourceNotFoundException;
+    OdontologistResponseDto addSpeciality(Integer idOdontologist, Integer idSpeciality) throws ResourceNotFoundException;
 }

@@ -15,6 +15,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -35,13 +36,19 @@ public class AppointmentService implements IAppointmentService{
 
     @Override
     public AppointmentResponseDto create(AppointmentRequestDto appointmentRequestDto) {
+        System.out.println("=== DEBUG SERVICE ===");
+        System.out.println("Buscando Patient con ID: " + appointmentRequestDto.getPatient_id());
         Optional<Patient> patient = patientRepository.findById(appointmentRequestDto.getPatient_id());
+        System.out.println("Patient encontrado: " + patient.isPresent());
+        System.out.println("Buscando Odontologist con ID: " + appointmentRequestDto.getOdontologist_id());
         Optional<Odontologist> odontologist = odontologistRepository.findById(appointmentRequestDto.getOdontologist_id());
+        System.out.println("Odontologist encontrado: " + odontologist.isPresent());
         Appointment appointment1 = new Appointment();
         Appointment appointment2 = null;
         AppointmentResponseDto appointmentResponseDto = null;
         if (patient.isPresent()&& odontologist.isPresent()){
-            appointment1.setDate(LocalDate.parse(appointmentRequestDto.getDate()));
+
+            appointment1.setDate(appointmentRequestDto.getDate());
             appointment1.setPatient(patient.get());
             appointment1.setOdontologist(odontologist.get());
             appointment2=appointmentRepository.save(appointment1);
@@ -80,7 +87,7 @@ public class AppointmentService implements IAppointmentService{
         Appointment appointment1 = new Appointment();
         if (patient.isPresent() && odontologist.isPresent() && appointment.isPresent()){
             appointment1.setId(id);
-            appointment1.setDate(LocalDate.parse(appointmentRequestDto.getDate()));
+            appointment1.setDate(appointmentRequestDto.getDate());
             appointment1.setPatient(patient.get());
             appointment1.setOdontologist(odontologist.get());
             appointmentRepository.save(appointment1);

@@ -24,8 +24,8 @@ public class Odontologist {
     private String name;
     private String lastname;
     private String license;
-    private String email;
     private String phone;
+    private String email;
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

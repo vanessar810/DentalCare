@@ -19,3 +19,4 @@ public class PatientRequestUpdateByAdminDTO {
     private String email;
     private String role;
 }
+

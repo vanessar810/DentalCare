@@ -65,9 +65,17 @@ public class PatientService implements IPatientService{
         return mapToResponseDto(patient2);
     }
 
-    public Optional<Patient> readId(Integer id){
-        return  patientRepository.findById(id);
+    public PatientResponseDto readId(Integer id){
+     Patient patient = patientRepository.findById(id).orElseThrow(()-> new RuntimeException("id not found"));
+        return  patientMapper.patientToPatientResponseDTOto(patient);
     }
+
+    @Override
+    public Patient findEntityById(Integer id) {
+        return patientRepository.findById(id)
+                .orElseThrow(()-> new RuntimeException("patient not found with id "+ id));
+    }
+
     @Override
     public List<PatientResponseDto> readAll(){
 
@@ -93,14 +101,11 @@ public class PatientService implements IPatientService{
     }
 
     @Override
-    public void delete(Integer id) throws ResourceNotFoundException {
-        Optional<Patient> patientOptional = readId(id);
-        if (patientOptional.isPresent()){
-            patientRepository.deleteById(id);
-        }
-        else
-            throw new ResourceNotFoundException("{\"message\":\"patient not found\"}");
+    public void delete(Integer id)  {
+        Patient patient = findEntityById(id);
+        patientRepository.delete(patient);
     }
+
     public PatientResponse2Dto getPatientInfo(User user) throws ResourceNotFoundException {
         Patient patientOptional = patientRepository.findByUser(user)
                 .orElseThrow(() -> new ResourceNotFoundException("{\"message\":\"patient not found\"}"));

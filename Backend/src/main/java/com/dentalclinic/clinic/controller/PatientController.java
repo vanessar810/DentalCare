@@ -51,14 +51,9 @@ public class PatientController {
     }
     //return a patient by an id
     @GetMapping("/{id}")
-    public ResponseEntity<Patient> readById(@PathVariable Integer id){
-        Optional<Patient> patient = patientService.readId(id);
-        if (patient.isPresent()){
-            Patient patient1 = patient.get();
-            return ResponseEntity.ok(patient1);
-        }else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    public ResponseEntity<PatientResponseDto> readById(@PathVariable Integer id){
+      PatientResponseDto patientResponseDto = patientService.readId(id);
+      return ResponseEntity.ok(patientResponseDto);
     }
     //returns information about the user/patient authenticated without id
     @GetMapping("/me")

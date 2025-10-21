@@ -14,4 +14,5 @@ public class OdontologistResponseDto {
     private String license;
     private String email;
     private String phone;
+    private String role;
 }

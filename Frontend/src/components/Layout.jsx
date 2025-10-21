@@ -6,7 +6,7 @@ import { useState } from 'react';
 function Layout() {
 
     return (
-        <div className="min-h-screen flex flex-col justify-between bg-indigo-200 dark:bg-black">
+        <div className="min-h-screen flex flex-col justify-between bg-amber-40 dark:bg-black">
             <Navbar />
             <main className="flex-grow">
                 <Outlet />

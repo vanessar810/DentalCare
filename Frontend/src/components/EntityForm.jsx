@@ -15,17 +15,13 @@ const EntityForm = ({
     const modalMode = initialData ? 'edit' : 'create';
     const fields = getEntityFields(entityType, modalMode);;
 
-    console.log('EntityForm - modalMode:', modalMode);
-    console.log('EntityForm - entityType:', entityType);
-    console.log('EntityForm - fields found:', fields.length);
-    console.log('EntityForm - initialData:', initialData);
+    // console.log('EntityForm - modalMode:', modalMode);
+    // console.log('EntityForm - entityType:', entityType);
+    // console.log('EntityForm - initialData:', initialData);
 
     //To charge initial data
     useEffect(() => {
-        console.log('🔍 EntityForm useEffect ejecutándose');
-        console.log('🔍 initialData en useEffect:', initialData);
         if (initialData && Object.keys(initialData).length > 0) {
-            console.log('🔍 Cargando datos iniciales en el formulario:', initialData);
             setFormData({ ...initialData });
         } else {
             // Valores por defecto para campos anidados
@@ -60,7 +56,6 @@ const EntityForm = ({
     };
 
     const handleInputChange = (fieldPath, value) => {
-        console.log(`🔍 handleInputChange - Field: ${fieldPath}, Value: ${value}`);
         setFormData(prev => {
             const newFormData = { ...prev };
             if (fieldPath.includes('.')) {
@@ -121,7 +116,7 @@ const EntityForm = ({
     const renderField = (fieldConfig) => {
         const value = getNestedValue(formData, fieldConfig.field) || '';
         const hasError = !!errors[fieldConfig.field];
-        console.log(`🔍 Rendering field ${fieldConfig.field} with value:`, value);
+        //console.log(`🔍 Rendering field ${fieldConfig.field} with value:`, value);
         const commonProps = {
             id: fieldConfig.field,
             name: fieldConfig.field,
@@ -201,7 +196,7 @@ const EntityForm = ({
                 <div key={fieldConfig.field} className="space-y-1">
                     <label
                         htmlFor={fieldConfig.field}
-                        className="block text-sm font-medium text-gray-700"
+                        className="block text-sm font-medium"
                     >
                         {fieldConfig.label}
                         {fieldConfig.required && <span className="text-red-500 ml-1">*</span>}
@@ -223,7 +218,7 @@ const EntityForm = ({
                     className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                     disabled={isLoading}
                 >
-                    Cancelar
+                    Cancel
                 </button>
                 <button
                     type="button"
@@ -231,7 +226,7 @@ const EntityForm = ({
                     disabled={isLoading}
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                 >
-                    {isLoading ? 'Guardando...' : (initialData ? 'Actualizar' : 'Crear')}
+                    {isLoading ? 'Saving...' : (initialData ? 'Update' : 'Create')}
                 </button>
             </div>
         </div>

@@ -11,6 +11,7 @@ const useApi = (endpoint) => {
         try {
             const response = await api.get(endpoint);
             setData(response.data);
+            
         } catch (err) {
             setError(err);
         } finally {
@@ -23,6 +24,7 @@ const useApi = (endpoint) => {
         try {
             const response = await api.post(endpoint, payload);
             setData(response.data);
+            console.log(response);
         } catch (err) {
             setError(err);
         } finally {

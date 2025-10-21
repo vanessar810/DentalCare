@@ -59,14 +59,14 @@ const EntityManager = ({ entityType, onBack }) => {
         validateForm: config.validateForm
     })
 
-console.log('🔍 EntityManager - data type:', typeof data);
+/*console.log('🔍 EntityManager - data type:', typeof data);
 console.log('🔍 EntityManager - data isArray:', Array.isArray(data));
-console.log('🔍 EntityManager - data value:', data);
+console.log('🔍 EntityManager - data value:', data);*/
 
     //filter based on search
     const filteredData = useMemo(() => {
         if (!data || !Array.isArray(data)) {
-            console.log('🔍 Data is not an array:', data);
+            // console.log('🔍 Data is not an array:', data);
             return [];
         }
         return data.filter(item => {
@@ -76,9 +76,7 @@ console.log('🔍 EntityManager - data value:', data);
     }, [data, searchTerm]);
 
     const openCreateModal = () => {
-        console.log('🔍 openCreateModal - Resetting form');
         resetForm();
-        console.log('🔍 EntityManager openCreateModal - After resetForm, selectedItem:', selectedItem);
         setShowModal(true);
     };
 
@@ -91,7 +89,6 @@ console.log('🔍 EntityManager - data value:', data);
     };
     
     const closeModal = () => {
-        console.log('🔍 EntityManager closeModal');
         setShowModal(false);
         resetForm();
     };
@@ -101,7 +98,7 @@ console.log('🔍 EntityManager - data value:', data);
         console.log('🔍 EntityManager onFormSubmit - selectedItem:', selectedItem);
 
         try {
-            const isEdit = selectedItem && selectedItem.id;
+            const isEdit = selectedItem && selectedItem.id; //de crudOperations
             console.log('🔍 Operation type:', isEdit ? 'UPDATE' : 'CREATE');
 
             // Adaptar datos según el tipo de operación
@@ -112,6 +109,7 @@ console.log('🔍 EntityManager - data value:', data);
                 console.log(`${config.singularName} actualizado exitosamente`);
             } else {
                 await post(backendData);
+                console.log(backendData)
                 console.log(`${config.singularName} creado exitosamente`);
             }
             await get();
@@ -131,7 +129,7 @@ console.log('🔍 EntityManager - data value:', data);
                     >
                         ← Back to Dashboard
                     </button>
-                    <h2 className="text-2xl font-bold text-gray-900 capitalize">
+                    <h2 className="text-2xl font-bold text capitalize">
                         {entityType} Management
                     </h2>
                 </div>
@@ -149,7 +147,7 @@ console.log('🔍 EntityManager - data value:', data);
                 </div>
             )}
 
-            <div className="bg-white rounded-lg shadow-sm p-4">
+            <div className="rounded-lg shadow-sm p-4">
                 <SearchBar
                     value={searchTerm}
                     onChange={setSearchTerm}
@@ -157,7 +155,7 @@ console.log('🔍 EntityManager - data value:', data);
                 />
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm">
+            <div className="rounded-lg shadow-sm">
                 <DataTable
                     entityType={entityType}
                     data={filteredData}

@@ -39,7 +39,6 @@ const CrudOperations = ({endpoint, getInitialFormData, validateForm}) => {
         } else {
             await post(formData);
         }
-
         await get(); // Recargar datos
         resetForm();
     };

@@ -36,28 +36,23 @@ const DataTable = ({ entityType, data, loading, onEdit, onDelete }) => {
             renderRow: (item) => {                
                 return [
                     item.id,
-                    `${item.user?.name || ''} ${item.user?.lastname || ''}`.trim() || 'N/A',
+                    `${item.name || ''} ${item.lastname || ''}`.trim() || 'N/A',
                     item.license || 'N/A',
                     item.phone || 'N/A',
-                    item.user?.email || 'N/A',
+                    item.email || 'N/A',
                 ];
             }
         },
         appointment: {
-            headers: ['ID', 'Patient ID', 'Odontologist ID', 'Date', 'Status', 'Actions'],
+            headers: ['ID', 'Patient ID', 'Patient name','Odontologist ID', 'Odontologist name', 'Date', 'Status', 'Actions'],
             renderRow: (item) => {               
                 return [
                     item.id,
-                    item.patientId,
-                    item.odontologistId,
-                    item.appointmentDate ? new Date(item.appointmentDate).toLocaleString() : 'N/A',
-                    <span key="status" className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        item.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
-                        item.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
-                        'bg-yellow-100 text-yellow-800'
-                    }`}>
-                        {item.status || 'UNKNOWN'}
-                    </span>
+                    item.patient.id,
+                    `${item.patient.name || ''} ${item.patient.lastname || ''}`.trim() || 'N/A',
+                    item.odontologist.id,
+                    `${item.odontologist.name || ''} ${item.odontologist.lastname || ''}`.trim() || 'N/A',
+                    item.date ? new Date(item.date).toLocaleString() : 'N/A',
                 ];
             }
         }
@@ -75,7 +70,7 @@ const DataTable = ({ entityType, data, loading, onEdit, onDelete }) => {
     return (
         <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="">
                     <tr>
                         {config.headers.map(header => (
                             <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -84,11 +79,11 @@ const DataTable = ({ entityType, data, loading, onEdit, onDelete }) => {
                         ))}
                     </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className=" divide-y divide-gray-200">
                     {data.map(item => (
-                        <tr key={item.id} className="hover:bg-gray-50">
+                        <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 ">
                             {config.renderRow(item).map((cell, index) => (
-                                <td key={index} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <td key={index} className="px-6 py-4 whitespace-nowrap text-sm">
                                     {cell}
                                 </td>
                             ))}
@@ -101,7 +96,7 @@ const DataTable = ({ entityType, data, loading, onEdit, onDelete }) => {
                                 </button>
                                 <button
                                     onClick={() => onDelete(item.id)}
-                                    className="text-red-600 hover:text-red-900"
+                                    className="text-red-200 hover:text-red-400"
                                 >
                                     Delete
                                 </button>

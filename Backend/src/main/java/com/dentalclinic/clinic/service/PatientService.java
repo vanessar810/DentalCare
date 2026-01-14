@@ -94,6 +94,7 @@ public class PatientService implements IPatientService{
 
     @Override
     public PatientResponseDto updateByAdmin(Integer id, PatientRequestUpdateByAdminDTO patientDto) {
+        System.out.println("🔍 DTO recibido: " + patientDto);
         Patient existingPatient = patientRepository.findById(id)
                 .orElseThrow(()-> new RuntimeException("Patient not found"));
         patientMapper.updatePatientFromDto(patientDto, existingPatient);

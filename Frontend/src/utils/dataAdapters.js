@@ -7,7 +7,7 @@
 
 //Adapting data from backend to the form
 export const adaptBackendToForm = (backendData, entityType) => {
-    console.log('🔍 Adapting backend data:', backendData, 'for entity:', entityType);
+   // console.log('🔍 Adapting backend data:', backendData, 'for entity:', entityType);
     if (!backendData) return null;
     switch (entityType) {
         case 'patient':
@@ -27,7 +27,7 @@ export const adaptBackendToForm = (backendData, entityType) => {
                     neighborhood: backendData.address ?.neighborhood || '',
                 }
             };
-            console.log('🔍 Adapted to form:', adaptedPatient);
+            //console.log('🔍 Adapted to form:', adaptedPatient);
             return adaptedPatient;
 
         case 'odontologist':
@@ -73,7 +73,7 @@ export const adaptBackendToForm = (backendData, entityType) => {
  */
 
 export const adaptFormToBackend = (formData, entityType, isEdit = false) => {
-    console.log('🔍 Adapting form data:', formData, 'isEdit:', isEdit, 'entity:', entityType);
+    //console.log('🔍 Adapting form data:', formData, 'isEdit:', isEdit, 'entity:', entityType);
     if (!formData) return null;
     switch (entityType) {
         case 'patient':
@@ -84,7 +84,7 @@ export const adaptFormToBackend = (formData, entityType, isEdit = false) => {
                     lastname: formData.user ?.lastname,
                     dni: formData.dni,
                     birthDate: formData.birthDate,
-                    addressDto: {
+                    address: {
                         street: formData.address ?.street,
                         number: formData.address ?.number,
                         neighborhood: formData.address ?.neighborhood,
@@ -92,6 +92,7 @@ export const adaptFormToBackend = (formData, entityType, isEdit = false) => {
                     email: formData.user ?.email,
                     role: formData.user ?.userRole || 'PATIENT',
                 };
+                //console.log('🔍 Adapted to bacl:', adaptedPatientUpdate);
                 return adaptedPatientUpdate;
             } else {
                 // ✅ ESTRUCTURA PARA CREATE: PatientByAdminRequestDTO

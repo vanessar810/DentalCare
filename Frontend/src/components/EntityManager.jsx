@@ -61,7 +61,7 @@ const EntityManager = ({ entityType, onBack }) => {
 
 /*console.log('🔍 EntityManager - data type:', typeof data);
 console.log('🔍 EntityManager - data isArray:', Array.isArray(data));*/
-console.log('🔍 EntityManager - data value:', data);
+// console.log('🔍 EntityManager - data value:', data);
 
     //filter based on search
     const filteredData = useMemo(() => {
@@ -95,18 +95,19 @@ console.log('🔍 EntityManager - data value:', data);
     };
 
     const onFormSubmit = async (entityFormData) => {
-        console.log('🔍 EntityManager onFormSubmit - Form data:', entityFormData);
+        console.log('🔍 EntityManager onFormSubmit - Form data(lo que se edito):', entityFormData);
         console.log('🔍 EntityManager onFormSubmit - selectedItem:', selectedItem);
 
         try {
-            const isEdit = selectedItem && selectedItem.id; //de crudOperations
+            const isEdit = entityFormData && entityFormData.id; //de crudOperations
             console.log('🔍 Operation type:', isEdit ? 'UPDATE' : 'CREATE');
 
             // Adaptar datos según el tipo de operación
             const backendData = adaptFormToBackend(entityFormData, entityType, isEdit);
 
             if (isEdit) {
-                await put(selectedItem.id, backendData);
+                await put(entityFormData.id, backendData);
+                console.log(backendData)
                 console.log(`${config.singularName} actualizado exitosamente`);
             } else {
                 await post(backendData);

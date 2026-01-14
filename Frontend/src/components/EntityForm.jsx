@@ -20,10 +20,25 @@ const EntityForm = ({
     // console.log('EntityForm - entityType:', entityType);
     // console.log('EntityForm - initialData:', initialData);
 
+    // Función para hacer copia profunda
+    const deepClone = (obj) => {
+        if (obj === null || typeof obj !== 'object') return obj;
+        if (obj instanceof Date) return new Date(obj.getTime());
+        if (obj instanceof Array) return obj.map(item => deepClone(item));
+        
+        const clonedObj = {};
+        for (let key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                clonedObj[key] = deepClone(obj[key]);
+            }
+        }
+        return clonedObj;
+    };
+
     //To charge initial data
     useEffect(() => {
         if (initialData && Object.keys(initialData).length > 0) {
-            setFormData({ ...initialData });
+            setFormData(deepClone(initialData));
         } else {
             // Valores por defecto para campos anidados
             const defaultValues = {};
@@ -42,23 +57,23 @@ const EntityForm = ({
 
     }, [initialData]);
     // Función para hacer merge profundo de objetos
-    const mergeDeep = (target, source) => {
-        const result = { ...target };
+    // const mergeDeep = (target, source) => {
+    //     const result = { ...target };
 
-        Object.keys(source).forEach(key => {
-            if (source[key] !== null && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-                result[key] = mergeDeep(result[key] || {}, source[key]);
-            } else {
-                result[key] = source[key];
-            }
-        });
+    //     Object.keys(source).forEach(key => {
+    //         if (source[key] !== null && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+    //             result[key] = mergeDeep(result[key] || {}, source[key]);
+    //         } else {
+    //             result[key] = source[key];
+    //         }
+    //     });
 
-        return result;
-    };
+    //     return result;
+    // };
 
     const handleInputChange = (fieldPath, value) => {
         setFormData(prev => {
-            const newFormData = { ...prev };
+            const newFormData = deepClone(prev);
             if (fieldPath.includes('.')) {
                 return setNestedValue(newFormData, fieldPath, value);
             } else {
@@ -105,8 +120,9 @@ const EntityForm = ({
         }
         setIsLoading(true);
         try {
-            console.log('sending form data:', formData);
-            await onSubmit(formData); // call to onFormSubmit of EntityManager
+            const dataToSubmit = deepClone(formData);
+            //console.log('sending form data:', dataToSubmit);
+            await onSubmit(dataToSubmit); // call to onFormSubmit of EntityManager
         } catch (error) {
             console.error('EntityForm: Error al enviar -', error);
         } finally {

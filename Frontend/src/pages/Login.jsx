@@ -21,15 +21,15 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("iniciando sesion")
+    //console.log("iniciando sesion")
     if (!validateForm(formData.email, formData.password)) return;
     setIsLoading(true);
 
     try {
       const { data } = await api.post('/auth/login', formData);
       storeToken(data.token)
-      console.log("token recibido:", data.token);
-      console.log("inicio de sesión exitoso")
+      // console.log("token recibido:", data.token);
+      // console.log("inicio de sesión exitoso")
 
       const { data: me } = await api.get('/auth/me');
       setUser(me);

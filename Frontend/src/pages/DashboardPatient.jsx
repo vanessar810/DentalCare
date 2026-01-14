@@ -71,13 +71,13 @@ const DashboardPatient = () => {
         const fetchData = async () => {
             try {
                 const response = await api.get('/patient/profile');
-                console.log('data from api:', response.data)
+                //console.log('data from api:', response.data)
                 setPatientData(response.data);
                 const patientId = response.data.id;
                 const appointmentsResponse = await api.get('/appointment/user', {
                     params: { patientId }
                 });
-                console.log('data from appoinments:', appointmentsResponse.data)
+                //console.log('data from appoinments:', appointmentsResponse.data)
                 setAppointments(appointmentsResponse.data);
             } catch (error) {
                 console.error('Error fetching user data:', error);
@@ -93,11 +93,12 @@ const DashboardPatient = () => {
         setFormData(null);
     };
     const openEditModal = (item, type, editContext = 'self') => {
-        console.log('🔍 DashPatient openEditModal item:', item, 'entityType: ', type);
+        //console.log('🔍 1. Original item', item, 'entityType: ', type);
         const adaptedItem = adaptBackendToForm(item, type);
+        //console.log('2. Adapted item:', adaptedItem);
         setIsCreatingAppointment(false);
         setIsEditingProfile(true);
-        setFormData(patientData);
+        setFormData(adaptedItem);
         setEditContext(editContext);
 
     };
@@ -111,12 +112,12 @@ const DashboardPatient = () => {
 
     const onFormSubmit = async (entityFormData) => {
         const backendData = adaptFormToBackend(entityFormData, entityType, isEditingProfile);
-        console.log('lo que llega al backend: ', backendData)
+        //console.log('PatientToBackend: ', backendData)
         try {
             if (isEditingProfile) {
                 const response = await api.put('/patient/me', backendData);
                 setPatientData(response.data)
-                console.log('lo que devuelve backend: ', response.data)
+                //console.log('lo que devuelve backend: ', response.data)
                 console.log("Information successfully updated");
             } else {
                 const response = await api.post('appointment', backendData)

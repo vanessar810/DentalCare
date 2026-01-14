@@ -59,9 +59,6 @@ const EntityManager = ({ entityType, onBack }) => {
         validateForm: config.validateForm
     })
 
-/*console.log('🔍 EntityManager - data type:', typeof data);
-console.log('🔍 EntityManager - data isArray:', Array.isArray(data));*/
-// console.log('🔍 EntityManager - data value:', data);
 
     //filter based on search
     const filteredData = useMemo(() => {
@@ -82,8 +79,9 @@ console.log('🔍 EntityManager - data isArray:', Array.isArray(data));*/
     };
 
     const openEditModal = (item, editContext= 'admin') => {
-        console.log('🔍 EntityManager openEditModal - Original item:', item);
+        //console.log('1. Original item:', item);
         const adaptedItem = adaptBackendToForm(item, entityType);
+        //.log('2. Adapted item:', adaptedItem);
         handleEdit(adaptedItem);
         setEditContext(editContext);
         setShowModal(true);

@@ -11,5 +11,5 @@ import lombok.*;
 public class PatientRequestUpdateByPatientDTO {
     private String name;
     private String lastname;
-    private AddressDto addressDto;
+    private AddressDto address;
 }

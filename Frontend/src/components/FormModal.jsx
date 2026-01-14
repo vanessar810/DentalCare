@@ -1,12 +1,12 @@
-import {useEffect} from 'react';
+import { useEffect } from 'react';
 const FormModal = ({ isOpen, title, onClose, children }) => {
-    if (!isOpen) return null;
     const handleBackdropClick = (e) => {
         if (e.target === e.currentTarget) {
             onClose();
         }
     };
     useEffect(() => {
+        if (!isOpen) return;
         const handleKeyDown = (e) => {
             if (e.key === "Escape") {
                 onClose();
@@ -16,8 +16,8 @@ const FormModal = ({ isOpen, title, onClose, children }) => {
         return () => {
             document.removeEventListener("keydown", handleKeyDown);
         };
-    }, [onClose]);
-
+    }, [onClose, isOpen]);
+    if (!isOpen) return null;
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 sm:p-6" onClick={handleBackdropClick}>
             <div className="bg-white rounded-lg p-6 w-full max-w-md sm:max-w-lg lg:max-w-1.5xl

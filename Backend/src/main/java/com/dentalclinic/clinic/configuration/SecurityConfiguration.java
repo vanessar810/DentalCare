@@ -34,7 +34,7 @@ public class SecurityConfiguration {
 
                             // endponints que necesitan algun tipo de rol especifico
                             auth.requestMatchers(HttpMethod.POST,"/api/v1/odontologist/**").hasAnyAuthority("ADMIN");
-                            auth.requestMatchers(HttpMethod.PUT,"/api/v1/odontologist/**").hasAnyAuthority("ADMIN");
+                            auth.requestMatchers(HttpMethod.PUT,"/api/v1/odontologist/**").hasAnyAuthority("ADMIN","DENTIST");
                             auth.requestMatchers(HttpMethod.DELETE,"/api/v1/odontologist/**").hasAnyAuthority("ADMIN");
                             auth.requestMatchers(HttpMethod.POST, "/api/v1/patient/profile").hasAnyAuthority("ADMIN", "USER");
                             auth.requestMatchers(HttpMethod.GET, "/api/v1/patient/profile").hasAnyAuthority("ADMIN", "PATIENT");

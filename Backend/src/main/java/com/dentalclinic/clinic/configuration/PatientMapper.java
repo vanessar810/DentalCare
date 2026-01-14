@@ -43,7 +43,7 @@ public interface PatientMapper {
     @Mapping(target = "appointmentSet", ignore = true)
     @Mapping(target = "dni", ignore = true)              // Ignorar campos que no están en el DTO
     @Mapping(target = "birthDate", ignore = true)
-    @Mapping(target = "address", source = "addressDto", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "address", source = "address", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "user.name", source = "name", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "user.lastname", source = "lastname", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "user.email",ignore = true)

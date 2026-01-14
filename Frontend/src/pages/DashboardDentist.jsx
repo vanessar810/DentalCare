@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../providers/AuthProvider';
 import { User2, Calendar, Settings, Clock, FileText, ChevronRight, Bell, Edit } from 'lucide-react';
+import { adaptFormToBackend, adaptBackendToForm } from '../utils/dataAdapters';
+import FormModal from "../components/FormModal";
+import EntityForm from "../components/EntityForm";
 
 
 const DashboardDentist = () => {
@@ -11,7 +14,10 @@ const DashboardDentist = () => {
     const [upcomingAppointments, setUpcomingAppointments] = useState([]);
     const [pastAppointments, setPastAppointments] = useState([]);
     const [editing, setEditing] = useState(false);
-    const [formData, setFormData] = useState(null)
+    const [formData, setFormData] = useState(null);
+    const [isEditingProfile, setIsEditingProfile] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [editContext, setEditContext] = useState();
 
     const services = [
         { name: 'Health Insurance', status: 'Active', renewal: '2025-12-31' },
@@ -26,21 +32,19 @@ const DashboardDentist = () => {
         { id: 3, action: 'Service Activated', date: '2025-07-01', details: 'Learning Platform access granted' },
         { id: 4, action: 'Document Uploaded', date: '2025-06-28', details: 'Performance review documents' }
     ];
-
     useEffect(() => {
+        if (isEditingProfile) {setShowModal(true)}
+    }, [isEditingProfile])
+
+    useEffect(() => {       
         const fetchData = async () => {
             try {
                 const response = await api.get('/odontologist/profile');
-                console.log('data from api:', response.data)
                 setDentisttData(response.data)
                 const dentistId = response.data.id;
-                console.log('dentist id:', dentistId)
                 const appointmentsResponse = await api.get('/appointment/odontologist', { params: { odontologistId: dentistId } });
-                console.log('data from appoinments:', appointmentsResponse.data)
                 setPastAppointments(appointmentsResponse.data.past)
-                console.log('PastAppointments:', appointmentsResponse.data.past)
                 setUpcomingAppointments(appointmentsResponse.data.upcoming)
-                console.log('UpcomingAppointments:', appointmentsResponse.data.upcoming)
 
             } catch (error) {
                 console.error('Error fetching user data:', error);
@@ -48,6 +52,21 @@ const DashboardDentist = () => {
         };
         fetchData();
     }, []);
+
+    const closeModal = () => {
+        setShowModal(false);;
+        setIsEditingProfile(false);
+        setFormData(null);
+    };
+    const openEditModal = (item, type, editContext = 'self') => {
+        console.log('🔍1. DashDentist openEditModal item:', item, 'entityType: ', type);
+        const adaptedItem = adaptBackendToForm(item, type);
+        console.log('2. Adapted item:', adaptedItem);
+        setIsEditingProfile(true);
+        setFormData(adaptedItem);
+        setEditContext(editContext);
+
+    };
 
     const handleEdit = () => {
         setEditing(!editing);
@@ -65,22 +84,18 @@ const DashboardDentist = () => {
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDafault();
+    const handleSubmit = async (entityFormData) => {
+        const backendData = adaptFormToBackend(entityFormData, 'odontologist', isEditingProfile)
+        console.log('DashDentist DentisToBackend: ', backendData)
         try {
-            await api.put('http://localhost:8080/patient/profile', FormData)
-            setPatientData(formData);
-            setEditing(false);
-            alert("Information successfully updated");
+            const response = await api.put(`odontologist/${dentistData.id}`, backendData)
+            setDentisttData(response.data)
+            console.log('DashDentist from back ', response.data)
+            closeModal()
         } catch (error) {
             console.error("Error updating data: ", error);
-            alert("There was an error updating your details");
+            alert("There was an error updating your dentist details");
         }
-    };
-    const getServiceStatus = (status) => {
-        return status === 'Active'
-            ? 'bg-green-100 text-green-800'
-            : 'bg-red-100 text-red-800';
     };
     const tableConfigs = {
         headers: ['ID', 'Patient ID', 'Patient name', 'Odontologist ID', 'Date'],
@@ -150,7 +165,10 @@ const DashboardDentist = () => {
                             <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-800">
                                 <div className="flex items-center justify-between mb-4">
                                     <h3 className="text-lg font-semibold text-gray-900 dark:text-neutral-400">Personal Information</h3>
-                                    <Edit className="w-5 h-5 text-gray-400 hover:text-gray-600 cursor-pointer" onClick={() => setEditing(!editing)} />
+                                    <Edit className="w-5 h-5 text-gray-400 hover:text-gray-600 cursor-pointer" onClick={() => {
+                                        const type = 'odontologist';
+                                        openEditModal(dentistData, type, 'self')
+                                    }} />
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
@@ -177,7 +195,7 @@ const DashboardDentist = () => {
 
                 {activeTab === 'appointmentsup' && (
                     <div className="lg:col-span-3 space-y-4 overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
+                        <table className="min-w-full divide-y divide-gray-200">
                             <thead className="">
                                 <tr>
                                     {tableConfigs.headers.map(header => (
@@ -199,7 +217,7 @@ const DashboardDentist = () => {
                                 ))}
                             </tbody>
                         </table>
-                        </div>
+                    </div>
                 )}
 
                 {activeTab === 'pastappointments' && (
@@ -229,6 +247,19 @@ const DashboardDentist = () => {
                     </div>
                 )}
             </div>
+            <FormModal
+                isOpen={showModal}
+                title={'Edit your information'}
+                onClose={closeModal}
+            >
+                <EntityForm
+                    entityType={'odontologist'}
+                    initialData={formData}
+                    onSubmit={handleSubmit}
+                    onCancel={closeModal}
+                    editContext="self"
+                />
+            </FormModal>
         </div>
     );
 };

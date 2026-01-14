@@ -48,22 +48,15 @@ export const adaptBackendToForm = (backendData, entityType) => {
             const adaptedAppointment = {
                 id: backendData.id,
                 date: backendData.date || '',
-                patient: {
-                    patient_id: backendData.patient.id || '',
-                },
-                odontologist: {
-                    odontologist_id: backendData.odontologist.id || '',
-                }             
-                // status: backendData.status || 'SCHEDULED',
-                // notes: backendData.notes || ''
-            };
+                patient_id: backendData.patient.id || '',
+                odontologist_id: backendData.odontologist.id || '',
+                };             
             return adaptedAppointment;
-
         default:
             console.warn(`No adapter found for entity type: ${entityType}`);
             return backendData;
     }
-};
+    };
 /**
  * Adapta datos del formulario al formato del backend
  * @param {Object} formData - Datos del formulario

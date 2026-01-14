@@ -86,7 +86,7 @@ public class PatientService implements IPatientService{
         userRepository.findByEmail(user.getEmail()).orElseThrow(()-> new RuntimeException("user not found"));
         Patient existingPatient = patientRepository.findByUser(user).orElseThrow(()-> new RuntimeException("Patient not found"));
         System.out.println("DTO recibido: " + patientDto);
-        System.out.println("Address DTO: " + patientDto.getAddressDto());
+        System.out.println("Address DTO: " + patientDto.getAddress());
         patientMapper.updatePatientFromDto(patientDto, existingPatient);
         Patient savedPatient = patientRepository.save(existingPatient);
         return patientMapper.patientToPatientResponseDTOto(savedPatient);

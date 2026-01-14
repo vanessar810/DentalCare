@@ -8,7 +8,6 @@ const EntityForm = ({
     onCancel,
     editContext,
 }) => {
-    // Estado local del formulario
     const [formData, setFormData] = useState({});
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
@@ -16,16 +15,12 @@ const EntityForm = ({
     const modalMode = initialData ? 'edit' : 'create';
     const fields = getEntityFields(entityType, modalMode, editContext);;
 
-    // console.log('EntityForm - modalMode:', modalMode);
-    // console.log('EntityForm - entityType:', entityType);
-    // console.log('EntityForm - initialData:', initialData);
-
     // Función para hacer copia profunda
     const deepClone = (obj) => {
         if (obj === null || typeof obj !== 'object') return obj;
         if (obj instanceof Date) return new Date(obj.getTime());
         if (obj instanceof Array) return obj.map(item => deepClone(item));
-        
+
         const clonedObj = {};
         for (let key in obj) {
             if (obj.hasOwnProperty(key)) {
@@ -37,8 +32,11 @@ const EntityForm = ({
 
     //To charge initial data
     useEffect(() => {
+        //console.log('🔍 3. EntityForm recibió initialData:', initialData);
+        //console.log('🔍 4. Campos esperados:', fields.map(f => f.field));
         if (initialData && Object.keys(initialData).length > 0) {
             setFormData(deepClone(initialData));
+            //console.log('🔍 5. FormData después de cargar:', deepClone(initialData));
         } else {
             // Valores por defecto para campos anidados
             const defaultValues = {};
@@ -52,24 +50,9 @@ const EntityForm = ({
             console.log('🔍 start form with default values:', defaultValues);
             setFormData(defaultValues);
         }
-        // Limpiar errores cuando se inicializa
         setErrors({});
 
     }, [initialData]);
-    // Función para hacer merge profundo de objetos
-    // const mergeDeep = (target, source) => {
-    //     const result = { ...target };
-
-    //     Object.keys(source).forEach(key => {
-    //         if (source[key] !== null && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-    //             result[key] = mergeDeep(result[key] || {}, source[key]);
-    //         } else {
-    //             result[key] = source[key];
-    //         }
-    //     });
-
-    //     return result;
-    // };
 
     const handleInputChange = (fieldPath, value) => {
         setFormData(prev => {

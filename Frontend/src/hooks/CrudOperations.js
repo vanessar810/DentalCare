@@ -1,5 +1,3 @@
-//Abstraer la lógica repetitiva de crear, leer, actualizar y eliminar entidades.
-//Centralizar el manejo de errores, mensajes de éxito y reseteo del formulario.
 import {useEffect,useState} from 'react';
 import useApi from './useApi';
 

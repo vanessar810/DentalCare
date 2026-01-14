@@ -7,6 +7,7 @@ import com.dentalclinic.clinic.exception.ResourceNotFoundException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public interface IAppointmentService {
     AppointmentResponseDto create(AppointmentRequestDto appointmentRequestDto);
@@ -17,4 +18,5 @@ public interface IAppointmentService {
     //HQL
     List<AppointmentResponseDto> findByDates(LocalDate startDate, LocalDate endDate);
     List<AppointmentResponseDto> findByUserId(Integer patientId);
+    Map<String, List<AppointmentResponseDto>> findByOdontologistId(Integer odontologistId);
 }

@@ -3,6 +3,7 @@ package com.dentalclinic.clinic.service;
 import com.dentalclinic.clinic.dto.request.OdontologistRequestDTO;
 import com.dentalclinic.clinic.dto.response.OdontologistResponseDto;
 import com.dentalclinic.clinic.entity.Odontologist;
+import com.dentalclinic.clinic.entity.User;
 import com.dentalclinic.clinic.exception.ResourceNotFoundException;
 
 import java.util.List;
@@ -19,4 +20,6 @@ public interface IOdontologistService {
     List<OdontologistResponseDto> findByNameLike (String name);
 
     OdontologistResponseDto addSpeciality(Integer idOdontologist, Integer idSpeciality) throws ResourceNotFoundException;
+
+    OdontologistResponseDto getOdontologistInfo(User user);
 }

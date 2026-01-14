@@ -98,4 +98,10 @@ public class OdontologistService implements IOdontologistService{
         return odontologist1;
         }
 
+   public OdontologistResponseDto getOdontologistInfo(User user) throws ResourceNotFoundException{
+        Odontologist odontologist = odontologistRepository.findByUser(user)
+                .orElseThrow(() -> new ResourceNotFoundException("{\"message\":\"odontologist not found\"}"));
+        return odontologistMapper.odontologistToResponseDTO(odontologist);
+   }
+
 }

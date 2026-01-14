@@ -47,7 +47,7 @@ export const adaptBackendToForm = (backendData, entityType) => {
         case 'appointment':
             const adaptedAppointment = {
                 id: backendData.id,
-                date: backendData.appointmentDate || '',
+                date: backendData.date || '',
                 patient: {
                     patient_id: backendData.patient.id || '',
                 },
@@ -84,7 +84,7 @@ export const adaptFormToBackend = (formData, entityType, isEdit = false) => {
                     lastname: formData.user ?.lastname,
                     dni: formData.dni,
                     birthDate: formData.birthDate,
-                    address: {
+                    addressDto: {
                         street: formData.address ?.street,
                         number: formData.address ?.number,
                         neighborhood: formData.address ?.neighborhood,

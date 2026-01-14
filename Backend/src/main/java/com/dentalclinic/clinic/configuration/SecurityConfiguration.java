@@ -39,15 +39,18 @@ public class SecurityConfiguration {
                             auth.requestMatchers(HttpMethod.POST, "/api/v1/patient/profile").hasAnyAuthority("ADMIN", "USER");
                             auth.requestMatchers(HttpMethod.GET, "/api/v1/patient/profile").hasAnyAuthority("ADMIN", "PATIENT");
                             auth.requestMatchers(HttpMethod.POST,"/api/v1/patient/**").hasAnyAuthority("ADMIN");
-                            auth.requestMatchers("/api/v1/patient/**").hasAnyAuthority("ADMIN");
+
                             auth.requestMatchers(HttpMethod.GET,"/api/v1/appointment/user").hasAnyAuthority("PATIENT");
+                            auth.requestMatchers(HttpMethod.GET, "/api/v1/appointment/odontologist").hasAnyAuthority("DENTIST");
+
+                            auth.requestMatchers(HttpMethod.PUT,"/api/v1/patient/me").hasAnyAuthority("PATIENT","ADMIN");
 
                             auth.requestMatchers(HttpMethod.GET,"/api/v1/patient/**").hasAnyAuthority("ADMIN");
                             auth.requestMatchers(HttpMethod.PUT,"/api/v1/patient/**").hasAnyAuthority("ADMIN");
                             auth.requestMatchers(HttpMethod.DELETE,"/api/v1/patient/**").hasAnyAuthority("ADMIN");
 
                             // endpoints que requieren autenticacion basica (tener al menos el rol de user)
-                            auth.requestMatchers("/api/v1/appointments/**").authenticated();
+                            auth.requestMatchers("/api/v1/appointment/**").authenticated();
                             auth.anyRequest().authenticated();
 
                         })

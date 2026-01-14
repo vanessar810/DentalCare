@@ -44,8 +44,10 @@ const DataTable = ({ entityType, data, loading, onEdit, onDelete }) => {
             }
         },
         appointment: {
-            headers: ['ID', 'Patient ID', 'Patient name','Odontologist ID', 'Odontologist name', 'Date', 'Status', 'Actions'],
-            renderRow: (item) => {               
+            headers: ['ID', 'Patient ID', 'Patient name','Odontologist ID', 'Odontologist name', 'Date', 'Actions'],
+            renderRow: (item) => {    
+                if (!item) 
+                    return ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'];           
                 return [
                     item.id,
                     item.patient.id,
@@ -73,7 +75,7 @@ const DataTable = ({ entityType, data, loading, onEdit, onDelete }) => {
                 <thead className="">
                     <tr>
                         {config.headers.map(header => (
-                            <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th key={header} className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 {header}
                             </th>
                         ))}

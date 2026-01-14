@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/appointment")
@@ -37,7 +38,6 @@ public class AppointmentController {
         }
     }
 
-
     @GetMapping
     public ResponseEntity<List<AppointmentResponseDto>> readAllAppointments(){
         return ResponseEntity.ok(appointmentService.readAll());
@@ -57,6 +57,11 @@ public class AppointmentController {
     @GetMapping("/user")
     public ResponseEntity<List<AppointmentResponseDto>> findUser(@RequestParam Integer patientId){
         return ResponseEntity.ok(appointmentService.findByUserId(patientId));
+    }
+    @GetMapping("/odontologist")
+    public ResponseEntity<java.util.Map<String, List<AppointmentResponseDto>>> findOdontologist(@RequestParam Integer odontologistId){
+        Map<String, List<AppointmentResponseDto>> response = appointmentService.findByOdontologistId(odontologistId);
+        return ResponseEntity.ok(response);
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteAppointment(@PathVariable Integer id) throws ResourceNotFoundException{

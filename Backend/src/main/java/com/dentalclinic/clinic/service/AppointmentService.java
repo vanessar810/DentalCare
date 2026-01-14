@@ -7,6 +7,7 @@ import com.dentalclinic.clinic.dto.response.PatientResponseDto;
 import com.dentalclinic.clinic.entity.Appointment;
 import com.dentalclinic.clinic.entity.Odontologist;
 import com.dentalclinic.clinic.entity.Patient;
+import com.dentalclinic.clinic.exception.AppointmentException;
 import com.dentalclinic.clinic.exception.ResourceNotFoundException;
 import com.dentalclinic.clinic.repository.IAppointmentRepository;
 import com.dentalclinic.clinic.repository.IOdontologistRepository;
@@ -16,9 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AppointmentService implements IAppointmentService{
@@ -44,10 +44,19 @@ public class AppointmentService implements IAppointmentService{
         Optional<Odontologist> odontologist = odontologistRepository.findById(appointmentRequestDto.getOdontologist_id());
         System.out.println("Odontologist encontrado: " + odontologist.isPresent());
         Appointment appointment1 = new Appointment();
+        int patientId = appointmentRequestDto.getPatient_id();
+        int odontologistId = appointmentRequestDto.getOdontologist_id();
+        LocalDateTime date = appointmentRequestDto.getDate();
         Appointment appointment2 = null;
         AppointmentResponseDto appointmentResponseDto = null;
         if (patient.isPresent()&& odontologist.isPresent()){
-
+            if (appointmentRepository.existsByOdontologistIdAndPatientIdAndDate(odontologistId, patientId, date)){
+                throw new AppointmentException("This appointment already exits");}
+            LocalDateTime start = date.minusMinutes(20);
+            LocalDateTime end = date.plusMinutes(20);
+            if (appointmentRepository.existsByOdontologistIdAndDateBetween(odontologistId, start, end)){
+                throw  new AppointmentException("Each appointments lasts 20 minutes");
+            }
             appointment1.setDate(appointmentRequestDto.getDate());
             appointment1.setPatient(patient.get());
             appointment1.setOdontologist(odontologist.get());
@@ -126,6 +135,26 @@ public class AppointmentService implements IAppointmentService{
         }
         return appointmentsDto;
     }
+    @Override
+    public Map<String, List<AppointmentResponseDto>> findByOdontologistId(Integer odontologistId) {
+        List<Appointment> appointments = appointmentRepository.findByOdontologistId(odontologistId);
+        LocalDateTime now = LocalDateTime.now();
+
+        List<AppointmentResponseDto> appointmentsDtoPast = appointments.stream()
+                .filter(a -> a.getDate().isBefore(now))
+                .map(this::mapToResponseDto)
+                .collect(Collectors.toList());
+
+        List<AppointmentResponseDto> appointmentsDtoUpcoming = appointments.stream()
+                .filter(a -> !a.getDate().isBefore(now))
+                .map(this::mapToResponseDto)
+                .collect(Collectors.toList());
+        Map<String, List<AppointmentResponseDto>> result = new HashMap<>();
+        result.put("past", appointmentsDtoPast);
+        result.put("upcoming", appointmentsDtoUpcoming);
+
+        return result;
+    }
 
     private AppointmentResponseDto mapToResponseDto(Appointment appointment){
         AppointmentResponseDto appointmentResponseDto = modelMapper.map(appointment,AppointmentResponseDto.class);
@@ -133,4 +162,4 @@ public class AppointmentService implements IAppointmentService{
         appointmentResponseDto.setPatient(modelMapper.map(appointment.getPatient(), PatientResponseDto.class));
         return appointmentResponseDto;
     }
-}
+    }

@@ -13,6 +13,7 @@ const EntityManager = ({ entityType, onBack }) => {
 
     const [searchTerm, setSearchTerm] = useState('');
     const [showModal, setShowModal] = useState(false);
+    const [editContext, setEditContext] = useState();
     
     const getEntityConfig = (type) => {
         const configs = {
@@ -42,7 +43,6 @@ const EntityManager = ({ entityType, onBack }) => {
         }
         return config;
     };
-
     const config = getEntityConfig(entityType);
     const { 
         items: data,
@@ -60,8 +60,8 @@ const EntityManager = ({ entityType, onBack }) => {
     })
 
 /*console.log('🔍 EntityManager - data type:', typeof data);
-console.log('🔍 EntityManager - data isArray:', Array.isArray(data));
-console.log('🔍 EntityManager - data value:', data);*/
+console.log('🔍 EntityManager - data isArray:', Array.isArray(data));*/
+console.log('🔍 EntityManager - data value:', data);
 
     //filter based on search
     const filteredData = useMemo(() => {
@@ -76,15 +76,16 @@ console.log('🔍 EntityManager - data value:', data);*/
     }, [data, searchTerm]);
 
     const openCreateModal = () => {
+        console.log('🔍 EntityManager - selectedItem:', selectedItem);
         resetForm();
         setShowModal(true);
     };
 
-    const openEditModal = (item) => {
+    const openEditModal = (item, editContext= 'admin') => {
         console.log('🔍 EntityManager openEditModal - Original item:', item);
-        // 👈 ADAPTER: Convertir datos del backend al formato del formulario
         const adaptedItem = adaptBackendToForm(item, entityType);
         handleEdit(adaptedItem);
+        setEditContext(editContext);
         setShowModal(true);
     };
     
@@ -175,6 +176,7 @@ console.log('🔍 EntityManager - data value:', data);*/
                     initialData={selectedItem}
                     onSubmit={onFormSubmit}
                     onCancel={closeModal}
+                    editContext="admin"
                 />
             </FormModal>
         </div>

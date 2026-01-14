@@ -4,11 +4,13 @@ import com.dentalclinic.clinic.dto.request.OdontologistRequestDTO;
 import com.dentalclinic.clinic.dto.response.OdontologistResponseDto;
 import com.dentalclinic.clinic.dto.response.PatientResponseDto;
 import com.dentalclinic.clinic.entity.Odontologist;
+import com.dentalclinic.clinic.entity.User;
 import com.dentalclinic.clinic.exception.ResourceNotFoundException;
 import com.dentalclinic.clinic.service.IOdontologistService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,6 +36,13 @@ public class OdontologistController {
             @RequestBody OdontologistRequestDTO odontologist) {
         OdontologistResponseDto odontologist1 = odontologistService.update(id, odontologist);
             return ResponseEntity.ok(odontologist1);
+    }
+
+    //returns information about the user/dentist authenticated with id
+    @GetMapping("/profile")
+    public  ResponseEntity<OdontologistResponseDto> getProfile(@AuthenticationPrincipal User user) throws ResourceNotFoundException{
+        OdontologistResponseDto odontologistResponseDto = odontologistService.getOdontologistInfo(user);
+        return ResponseEntity.ok(odontologistResponseDto);
     }
 
     @GetMapping("/{id}")

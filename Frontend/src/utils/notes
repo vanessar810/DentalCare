@@ -1,0 +1,23 @@
+//DashboardPatient
+
+const [patientData, setPatientData] = useState(null);
+const [appointments, setAppointments] = useState([]);
+const [isEditingProfile, setIsEditingProfile] = useState(true);
+const [isCreatingAppointment, setIsCreatingAppointment] = useState(false);
+const [formData, setFormData] = useState(null)
+const [showModal, setShowModal] = useState(false);
+
+patientData
+--> guarda información que recibe de la api (fetch)
+--> guarda formulario enviado al backend (onFormsubmit)
+appointments 
+--> guarda información que recibe de la api JSON (fetch)
+
+isEditingProfile --> Define entityType as patient
+isCreatingAppointment --> Define entityType as appointment
+formData
+--> guarda información que recibe de la api (fetch)
+--> guarda información que viene del backend adaptada al form
+ la estas usando para enviarla al modal -.- 
+ y también de parametro .-.
+showModal

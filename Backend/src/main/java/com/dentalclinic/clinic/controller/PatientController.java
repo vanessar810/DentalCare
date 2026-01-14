@@ -68,7 +68,7 @@ public class PatientController {
         return ResponseEntity.ok(patientResponseDto);
     }
     //update patient from patient
-    @PutMapping("me")
+    @PutMapping("/me")
     public ResponseEntity<PatientResponseDto> updatePatient(
             @RequestBody PatientRequestUpdateByPatientDTO patient,
             @AuthenticationPrincipal User user){

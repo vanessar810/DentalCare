@@ -10,6 +10,7 @@ import PrivateRoute from './components/PrivateRoute';
 import './App.css'
 import DashboardPatient from './pages/DashboardPatient';
 import DashboardAdmin from './pages/DashboardAdmin';
+import DashboardDentist from './pages/DashboardDentist';
 function App() {
   return (
     <Routes>
@@ -22,6 +23,7 @@ function App() {
         <Route path="appointments" element={<PrivateRoute> <Appointments /></PrivateRoute>} />
         <Route path="dashboardPatient" element={<PrivateRoute> <DashboardPatient /></PrivateRoute>} />
         <Route path="dashboardAdmin" element={<PrivateRoute> <DashboardAdmin /></PrivateRoute>} />
+        <Route path ="dashboardDentist" element={<PrivateRoute> <DashboardDentist/> </PrivateRoute>}/>
         <Route path="*" element={<h1 className="text-center mt-10 dark:text-neutral-400">404 – Not Found</h1>} />
       </Route>
     </Routes >

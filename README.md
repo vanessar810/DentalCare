@@ -19,4 +19,12 @@ A full-stack web application for managing a dental clinic. Includes secure patie
 - Responsive user interface
 - JWT-based secure authentication
 
+para levantar Frontend:
+`cd Frontend`
+```npm run dev```
+para levantar Backend:
+`cd Backend`
+``` mvn spring-boot:run```
+
+
 

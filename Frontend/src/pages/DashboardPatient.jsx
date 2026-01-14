@@ -2,14 +2,22 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../providers/AuthProvider';
 import { User2, Calendar, Settings, Clock, FileText, ChevronRight, Bell, Edit } from 'lucide-react';
+import FormModal from "../components/FormModal";
+import EntityForm from "../components/EntityForm";
+import { adaptBackendToForm, adaptFormToBackend } from '../utils/dataAdapters';
+import { patientValidateForm, getPatientInitialFormData } from '../utils/patientValidateForm';
+import { appointmentValidateForm, getAppoinmentInitialFormData } from '../utils/appointmentValidateForm';
 
 const DashboardPatient = () => {
     const [activeTab, setActiveTab] = useState('overview');
     const { User } = useAuth();
     const [patientData, setPatientData] = useState(null);
     const [appointments, setAppointments] = useState([]);
-    const [editing, setEditing] = useState(false);
+    const [isEditingProfile, setIsEditingProfile] = useState(false);
+    const [isCreatingAppointment, setIsCreatingAppointment] = useState(false);
     const [formData, setFormData] = useState(null)
+    const [showModal, setShowModal] = useState(false);
+    const [editContext, setEditContext] = useState();
 
     const services = [
         { name: 'Health Insurance', status: 'Active', renewal: '2025-12-31' },
@@ -25,16 +33,49 @@ const DashboardPatient = () => {
         { id: 4, action: 'Document Uploaded', date: '2025-06-28', details: 'Performance review documents' }
     ];
 
+    const entityType = isEditingProfile ? 'patient' :
+        isCreatingAppointment ? 'appointment' :
+            null;
+    useEffect(() => {
+        if (isEditingProfile || isCreatingAppointment) {
+            setShowModal(true);
+            console.log(entityType)
+        }
+    }, [isEditingProfile, isCreatingAppointment]);
+
+    const getEntityConfig = (type) => {
+        const configs = {
+            patient: {
+                validateForm: patientValidateForm,
+                getInitialFormData: getPatientInitialFormData,
+                singularName: 'Patient',
+                pluralName: 'Patients'
+            },
+            appointment: {
+                validateForm: appointmentValidateForm,
+                getInitialFormData: getAppoinmentInitialFormData,
+                singularName: 'Appointment',
+                pluralName: 'Appointments'
+            }
+        };
+
+        const config = configs[type];
+        if (!config) {
+            throw new Error(`Unsupported entity type: ${type}`);
+        }
+        return config;
+    };
+    const config = entityType ? getEntityConfig(entityType) : null;
+
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await api.get('/patient/profile');
                 console.log('data from api:', response.data)
                 setPatientData(response.data);
-                setFormData(response.data);
                 const patientId = response.data.id;
-                const appointmentsResponse = await api.get('/appointment/user',{
-                    params: {patientId}
+                const appointmentsResponse = await api.get('/appointment/user', {
+                    params: { patientId }
                 });
                 console.log('data from appoinments:', appointmentsResponse.data)
                 setAppointments(appointmentsResponse.data);
@@ -45,29 +86,46 @@ const DashboardPatient = () => {
         fetchData();
     }, []);
 
-    const handleEdit = () => {
-        setEditing(!editing);
+    const closeModal = () => {
+        setShowModal(false);;
+        setIsEditingProfile(false);
+        setIsCreatingAppointment(false);
+        setFormData(null);
     };
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        if (name.startsWith('address.')) {
-            const field = name.split('.')[1];
-            setFormData((prev) => ({
-                ...prev,
-                address: { ...prev.address, [field]: value },
-            }));
-        } else {
-            setFormData((prev) => ({ ...prev, [name]: value }))
-        }
+    const openEditModal = (item, type, editContext = 'self') => {
+        console.log('🔍 DashPatient openEditModal item:', item, 'entityType: ', type);
+        const adaptedItem = adaptBackendToForm(item, type);
+        setIsCreatingAppointment(false);
+        setIsEditingProfile(true);
+        setFormData(patientData);
+        setEditContext(editContext);
+
+    };
+    const openCreateModal = () => {
+        setIsEditingProfile(false);
+        setIsCreatingAppointment(true);
+        setFormData({ patient_id: patientData.id });
+
+
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDafault();
+    const onFormSubmit = async (entityFormData) => {
+        const backendData = adaptFormToBackend(entityFormData, entityType, isEditingProfile);
+        console.log('lo que llega al backend: ', backendData)
         try {
-            await api.put('http://localhost:8080/patient/profile', FormData)
-            setPatientData(formData);
-            setEditing(false);
-            alert("Information successfully updated");
+            if (isEditingProfile) {
+                const response = await api.put('/patient/me', backendData);
+                setPatientData(response.data)
+                console.log('lo que devuelve backend: ', response.data)
+                console.log("Information successfully updated");
+            } else {
+                const response = await api.post('appointment', backendData)
+                setPatientData(response.data)
+                console.log('appointment created backend: ', response.data)
+
+            }
+            closeModal();
+
         } catch (error) {
             console.error("Error updating data: ", error);
             alert("There was an error updating your details");
@@ -78,7 +136,7 @@ const DashboardPatient = () => {
             ? 'bg-green-100 text-green-800'
             : 'bg-red-100 text-red-800';
     };
-    if (!patientData || !formData) return <p>Cargando...</p>;
+    if (!patientData) return <p>Cargando...</p>;
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -88,7 +146,6 @@ const DashboardPatient = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <h2 className="text-2xl font-bold mb-2">Welcome, {patientData.name}!</h2>
-
                         </div>
                         <div className="text-right">
                             <div className="text-3xl font-bold">{appointments.length}</div>
@@ -133,7 +190,10 @@ const DashboardPatient = () => {
                             <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-800">
                                 <div className="flex items-center justify-between mb-4">
                                     <h3 className="text-lg font-semibold text-gray-900 dark:text-neutral-400">Personal Information</h3>
-                                    <Edit className="w-5 h-5 text-gray-400 hover:text-gray-600 cursor-pointer" onClick={() => setEditing(!editing)} />
+                                    <Edit className="w-5 h-5 text-gray-400 hover:text-gray-600 cursor-pointer" onClick={() => {
+                                        const type = 'patient';
+                                        openEditModal(patientData, type, 'self');
+                                    }} />
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
@@ -165,11 +225,18 @@ const DashboardPatient = () => {
                             <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-800">
                                 <h3 className="text-lg font-semibold text-gray-900 mb-4 dark:text-neutral-400">Quick Actions</h3>
                                 <div className="space-y-3">
-                                    <button className="w-full flex items-center justify-between p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors dark:bg-gray-700">
+                                    <button
+                                        onClick={openCreateModal}
+                                        className="w-full flex items-center justify-between p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors dark:bg-gray-700">
                                         <span className="text-sm font-medium text-blue-900 dark:text-neutral-400">Schedule Appointment</span>
                                         <ChevronRight className="w-4 h-4 text-blue-600" />
                                     </button>
-                                    <button className="w-full flex items-center justify-between p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors dark:bg-gray-700">
+                                    <button
+                                        onClick={() => {
+                                            const type = 'patient';
+                                            openEditModal(patientData, type, 'self');
+                                        }}
+                                        className="w-full flex items-center justify-between p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors dark:bg-gray-700">
                                         <span className="text-sm font-medium text-green-900 dark:text-neutral-400">Update Profile</span>
                                         <ChevronRight className="w-4 h-4 text-green-600" />
                                     </button>
@@ -188,14 +255,20 @@ const DashboardPatient = () => {
                         {appointments.length === 0 ? (
                             <p className='dark:text-neutral-400'>There are no scheduled appointments..</p>
                         ) : (
-                            appointments.map((appt) => (
-                                <div key={appt.id} className="border rounded p-4 shadow-sm">
-                                    <p><strong>Date:</strong> {appt.date}</p>
-                                    <p><strong>Hour:</strong> {appt.time}</p>
-                                    <p><strong>Specialist:</strong> {appt.doctorName}</p>
-                                    <p><strong>Subject:</strong> {appt.reason}</p>
-                                </div>
-                            ))
+                            appointments.map((appt) => {
+                                const [date, hour] = appt.date.split('T');
+                                return (
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div key={appt.id} className="border rounded p-4 shadow-sm">
+                                            <Edit className="w-5 h-5 text-gray-400 hover:text-gray-600 cursor-pointer" />
+                                            <p><strong>Date:</strong> {date} </p>
+                                            <p><strong>Hour:</strong> {hour}</p>
+                                            <p><strong>Specialist:</strong> {appt.odontologist.name + " " + appt.odontologist.lastname}</p>
+                                            <p><strong>Subject:</strong> {appt.reason}</p>
+                                        </div>
+                                    </div>
+                                );
+                            })
                         )}
                     </div>
                 )}
@@ -253,6 +326,19 @@ const DashboardPatient = () => {
                     </div>
                 )}
             </div>
+            <FormModal
+                isOpen={showModal}
+                title={`${isEditingProfile ? 'Edit your information' : 'Create appointment'}`}
+                onClose={closeModal}
+            >
+                <EntityForm
+                    entityType={entityType}
+                    initialData={formData}
+                    onSubmit={onFormSubmit}
+                    onCancel={closeModal}
+                    editContext="self"
+                />
+            </FormModal>
         </div>
     );
 };

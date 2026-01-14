@@ -42,7 +42,10 @@ const Login = () => {
         } else {
           navigate('/dashboardPatient', { replace: true });
         }
-      } else {
+      } else if (me.role == 'DENTIST'){
+        navigate('/dashboardDentist', {replace: true});
+      }
+      else {
         etErrors({ api: 'Rol no found. Contact administration.' });
       }
     }

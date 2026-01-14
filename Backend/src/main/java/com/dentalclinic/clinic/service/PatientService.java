@@ -78,7 +78,6 @@ public class PatientService implements IPatientService{
 
     @Override
     public List<PatientResponseDto> readAll(){
-
         return patientMapper.patientsToPatientResponseDtos(patientRepository.findAll());
     }
 
@@ -86,6 +85,8 @@ public class PatientService implements IPatientService{
     public PatientResponseDto updateByPatient(User user, PatientRequestUpdateByPatientDTO patientDto) {
         userRepository.findByEmail(user.getEmail()).orElseThrow(()-> new RuntimeException("user not found"));
         Patient existingPatient = patientRepository.findByUser(user).orElseThrow(()-> new RuntimeException("Patient not found"));
+        System.out.println("DTO recibido: " + patientDto);
+        System.out.println("Address DTO: " + patientDto.getAddressDto());
         patientMapper.updatePatientFromDto(patientDto, existingPatient);
         Patient savedPatient = patientRepository.save(existingPatient);
         return patientMapper.patientToPatientResponseDTOto(savedPatient);
@@ -115,7 +116,7 @@ public class PatientService implements IPatientService{
     public PatientResponseDto getProfile(User user) throws ResourceNotFoundException {
         Patient patientOptional = patientRepository.findByUser(user)
                 .orElseThrow(() -> new ResourceNotFoundException("{\"message\":\"patient not found\"}"));
-        return mapToResponseDto(patientOptional);
+        return patientMapper.patientToPatientResponseDTOto(patientOptional);
     }
 
     private Patient mapToEntity2(PatientRequestDto patientRequestDto){

@@ -1,15 +1,15 @@
-export const getFieldConfigs = (modalMode = 'create') =>({
+export const getFieldConfigs = (modalMode = 'create', editContext ='admin') =>({
     patient: [
-        { field: 'user.name', label: 'Name', type: 'text', required: true },
-        { field: 'user.lastname', label: 'Last Name', type: 'text', required: true },
-        { field: 'user.email', label: 'email', type: 'email', required: true },
-        { field: 'user.password', label: 'password', type: 'password', required: modalMode === 'create' },
-        { field: 'user.userRole', label: 'Role', type: 'select', options: ['PATIENT', 'ADMIN', 'DENTIST'], required: true },
-        { field: 'dni', label: 'DNI', type: 'text', required: true },
-        { field: 'birthDate', label: 'birthdate', type: 'date', required: true },
-        { field: 'address.street', label: 'street', type: 'text', required: true },
-        { field: 'address.number', label: 'number', type: 'text', required: true },
-        { field: 'address.neighborhood', label: 'neighborhood', type: 'text', required: true },],
+        { field: 'user.name', label: 'Name', type: 'text', required: true, disabled: false},
+        { field: 'user.lastname', label: 'Last Name', type: 'text', required: true, disabled: false},
+        { field: 'user.email', label: 'email', type: 'email', required: true, disabled: editContext === 'self'},
+        { field: 'user.password', label: 'password', type: 'password', required: modalMode === 'create', disabled: editContext === 'self'},
+        { field: 'user.userRole', label: 'Role', type: 'select', options: ['PATIENT', 'ADMIN', 'DENTIST'], required: true, disabled: editContext === 'self'},
+        { field: 'dni', label: 'DNI', type: 'text', required: true, disabled: editContext === 'self'},
+        { field: 'birthDate', label: 'birthdate', type: 'date', required: true, disabled: editContext === 'self'},
+        { field: 'address.street', label: 'street', type: 'text', required: true, disabled: false},
+        { field: 'address.number', label: 'number', type: 'text', required: true, disabled: false},
+        { field: 'address.neighborhood', label: 'neighborhood', type: 'text', required: true, disabled: false},],
     odontologist: [
         { field: 'user.name', label: 'Name', type: 'text', required: true },
         { field: 'user.lastname', label: 'Last Name', type: 'text', required: true },
@@ -20,7 +20,7 @@ export const getFieldConfigs = (modalMode = 'create') =>({
         { field: 'license', label: 'License', type: 'text', required: true },
         ],
     appointment: [
-        { field: 'patient_id', label: 'Patient ID', type: 'number', required: true },
+        { field: 'patient_id', label: 'Patient ID', type: 'number', required: true, disabled: editContext === 'self'},
         { field: 'odontologist_id', label: 'Odontologist ID', type: 'number', required: true },
         { field: 'date', label: 'Date', type: 'datetime-local', required: true },
        // { field: 'description', label: 'Description', type: 'text', required: false },
@@ -47,8 +47,8 @@ export const setNestedValue = (obj, path, value) => {
     };
 };
 
-export const getEntityFields = (entityType, modalMode = 'create') => {
-    const allConfigs = getFieldConfigs(modalMode);
+export const getEntityFields = (entityType, modalMode = 'create', editContext ='admin') => {
+    const allConfigs = getFieldConfigs(modalMode,editContext);
     return allConfigs[entityType] || [];
 };
 

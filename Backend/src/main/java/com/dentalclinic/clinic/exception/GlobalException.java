@@ -1,5 +1,6 @@
 package com.dentalclinic.clinic.exception;
 
+import com.dentalclinic.clinic.entity.Appointment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -15,6 +16,10 @@ public class GlobalException {
    }
    @ExceptionHandler(EmailAlreadyUsedException.class)
     public ResponseEntity<String> handleEmailDuplicate(EmailAlreadyUsedException e){
+       return  ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+   }
+   @ExceptionHandler(AppointmentException.class)
+    public  ResponseEntity<String> handleAppointments(AppointmentException e){
        return  ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
    }
 

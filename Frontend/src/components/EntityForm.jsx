@@ -6,6 +6,7 @@ const EntityForm = ({
     initialData = null,
     onSubmit,
     onCancel,
+    editContext,
 }) => {
     // Estado local del formulario
     const [formData, setFormData] = useState({});
@@ -13,7 +14,7 @@ const EntityForm = ({
     const [isLoading, setIsLoading] = useState(false);
 
     const modalMode = initialData ? 'edit' : 'create';
-    const fields = getEntityFields(entityType, modalMode);;
+    const fields = getEntityFields(entityType, modalMode, editContext);;
 
     // console.log('EntityForm - modalMode:', modalMode);
     // console.log('EntityForm - entityType:', entityType);
@@ -33,7 +34,7 @@ const EntityForm = ({
                     defaultValues[fieldConfig.field] = '';
                 }
             });
-            console.log('🔍 Inicializando formulario con valores por defecto:', defaultValues);
+            console.log('🔍 start form with default values:', defaultValues);
             setFormData(defaultValues);
         }
         // Limpiar errores cuando se inicializa
@@ -104,8 +105,8 @@ const EntityForm = ({
         }
         setIsLoading(true);
         try {
-            console.log('Enviando datos del formulario:', formData);
-            await onSubmit(formData); // Llamar al onFormSubmit de EntityManager
+            console.log('sending form data:', formData);
+            await onSubmit(formData); // call to onFormSubmit of EntityManager
         } catch (error) {
             console.error('EntityForm: Error al enviar -', error);
         } finally {
@@ -122,6 +123,7 @@ const EntityForm = ({
             name: fieldConfig.field,
             value: value,
             onChange: (e) => handleInputChange(fieldConfig.field, e.target.value),
+            disabled: fieldConfig.disabled,
             className: `w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${hasError ? 'border-red-500' : 'border-gray-300'
                 }`,
         };
@@ -129,7 +131,7 @@ const EntityForm = ({
             case 'select':
                 return (
                     <select {...commonProps}>
-                        <option value="">Seleccione una opción</option>
+                        <option value="">Choose an option</option>
                         {fieldConfig.options?.map(option => (
                             <option key={option} value={option}>
                                 {option}
@@ -182,16 +184,16 @@ const EntityForm = ({
             <div className="mb-4 p-3 bg-blue-50 rounded-lg">
                 <p className="text-sm text-blue-700">
                     {initialData ?
-                        `Editando ${entityType}: ${getNestedValue(formData, 'user.name') || 'Sin nombre'}` :
-                        `Creando nuevo ${entityType}`
+                        `Editing ${entityType}: ${getNestedValue(formData, 'user.name') || 'Sin nombre'}` :
+                        `Creating new ${entityType}`
                     }
                 </p>
                 <p className="text-xs text-blue-600">
-                    Modo: {modalMode} | Campos: {fields.length}
+                    Mode: {modalMode} | fields: {fields.length}
                 </p>
             </div>
 
-            {/* Campos del formulario */}
+            {/* formfields */}
             {fields.map((fieldConfig) => (
                 <div key={fieldConfig.field} className="space-y-1">
                     <label
@@ -210,7 +212,7 @@ const EntityForm = ({
                 </div>
             ))}
 
-            {/* Botones de acción */}
+            {/* action buttons */}
             <div className="flex justify-end space-x-3 pt-4 border-t">
                 <button
                     type="button"

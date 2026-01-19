@@ -125,15 +125,23 @@ public class AppointmentService implements IAppointmentService{
     }
 
     @Override
-    public List<AppointmentResponseDto> findByUserId(Integer patientId) {
+    public Map<String, List<AppointmentResponseDto>> findByUserId(Integer patientId) {
         List<Appointment> appointments = appointmentRepository.findByUserId(patientId);
-        List<AppointmentResponseDto> appointmentsDto = new ArrayList<>();
-        AppointmentResponseDto appointmentResponseDto = null;
-        for (Appointment appointment: appointments){
-            appointmentResponseDto = mapToResponseDto(appointment);
-            appointmentsDto.add(appointmentResponseDto);
-        }
-        return appointmentsDto;
+        LocalDateTime now = LocalDateTime.now();
+
+        List<AppointmentResponseDto> appointmentsDtoPast =appointments.stream()
+                .filter(a -> a.getDate().isBefore(now))
+                .map(this::mapToResponseDto)
+                .collect(Collectors.toList());
+        List<AppointmentResponseDto> appointmentsDtoUpcoming = appointments.stream()
+                .filter(a -> !a.getDate().isBefore(now))
+                .map(this::mapToResponseDto)
+                .collect(Collectors.toList());
+
+        Map<String, List<AppointmentResponseDto>> result = new HashMap<>();
+        result.put("past", appointmentsDtoPast);
+        result.put("upcoming", appointmentsDtoUpcoming);
+        return result;
     }
     @Override
     public Map<String, List<AppointmentResponseDto>> findByOdontologistId(Integer odontologistId) {

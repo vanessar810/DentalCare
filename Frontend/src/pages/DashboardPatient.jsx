@@ -12,9 +12,11 @@ const DashboardPatient = () => {
     const [activeTab, setActiveTab] = useState('overview');
     const { User } = useAuth();
     const [patientData, setPatientData] = useState(null);
-    const [appointments, setAppointments] = useState([]);
+    const [upcomingAppointments, setUpcomingAppointments] = useState([]);
+    const [pastAppointments, setPastAppointments] = useState([]);
     const [isEditingProfile, setIsEditingProfile] = useState(false);
     const [isCreatingAppointment, setIsCreatingAppointment] = useState(false);
+    const [isEditingAppointment, setIsEditingAppointment] = useState(false);
     const [formData, setFormData] = useState(null)
     const [showModal, setShowModal] = useState(false);
     const [editContext, setEditContext] = useState();
@@ -23,7 +25,6 @@ const DashboardPatient = () => {
         { name: 'Health Insurance', status: 'Active', renewal: '2025-12-31' },
         { name: 'Parking Access', status: 'Active', renewal: '2025-08-15' },
         { name: 'IT Support', status: 'Active', renewal: 'Ongoing' },
-        { name: 'Learning Platform', status: 'Active', renewal: '2025-11-30' }
     ];
 
     const history = [
@@ -35,13 +36,14 @@ const DashboardPatient = () => {
 
     const entityType = isEditingProfile ? 'patient' :
         isCreatingAppointment ? 'appointment' :
-            null;
+            isEditingAppointment ? 'appointment' :
+                null;
     useEffect(() => {
-        if (isEditingProfile || isCreatingAppointment) {
+        if (isEditingProfile || isCreatingAppointment || isEditingAppointment) {
             setShowModal(true);
             console.log(entityType)
         }
-    }, [isEditingProfile, isCreatingAppointment]);
+    }, [isEditingProfile, isCreatingAppointment, isEditingAppointment]);
 
     const getEntityConfig = (type) => {
         const configs = {
@@ -77,8 +79,9 @@ const DashboardPatient = () => {
                 const appointmentsResponse = await api.get('/appointment/user', {
                     params: { patientId }
                 });
-                //console.log('data from appoinments:', appointmentsResponse.data)
-                setAppointments(appointmentsResponse.data);
+                console.log('data from appoinments:', appointmentsResponse.data)
+                setPastAppointments(appointmentsResponse.data.past)
+                setUpcomingAppointments(appointmentsResponse.data.upcoming)
             } catch (error) {
                 console.error('Error fetching user data:', error);
             }
@@ -90,6 +93,7 @@ const DashboardPatient = () => {
         setShowModal(false);;
         setIsEditingProfile(false);
         setIsCreatingAppointment(false);
+        setIsEditingAppointment(false);
         setFormData(null);
     };
     const openEditModal = (item, type, editContext = 'self') => {
@@ -97,7 +101,11 @@ const DashboardPatient = () => {
         const adaptedItem = adaptBackendToForm(item, type);
         //console.log('2. Adapted item:', adaptedItem);
         setIsCreatingAppointment(false);
-        setIsEditingProfile(true);
+        if (type === 'patient') {
+            setIsEditingProfile(true);
+        } else if (type === 'appointment') {
+            setIsEditingAppointment(true);
+        }
         setFormData(adaptedItem);
         setEditContext(editContext);
 
@@ -111,18 +119,25 @@ const DashboardPatient = () => {
     };
 
     const onFormSubmit = async (entityFormData) => {
-        const backendData = adaptFormToBackend(entityFormData, entityType, isEditingProfile);
+        const backendData = adaptFormToBackend(entityFormData, entityType, isEditingProfile || isEditingAppointment);
         //console.log('PatientToBackend: ', backendData)
         try {
             if (isEditingProfile) {
+                //patient editing its profile
                 const response = await api.put('/patient/me', backendData);
                 setPatientData(response.data)
                 //console.log('lo que devuelve backend: ', response.data)
                 console.log("Information successfully updated");
+            } else if (isEditingAppointment) {
+                const response = await api.put(`/appointment/${formData.id}`, backendData);
+                setUpcomingAppointments(upcomingAppointments.map(appt =>
+                    appt.id === formData.id ? response.data : appt
+                ));
             } else {
+                //patient creating an appointment
                 const response = await api.post('appointment', backendData)
-                setPatientData(response.data)
-                console.log('appointment created backend: ', response.data)
+                setUpcomingAppointments([...upcomingAppointments, response.data.upcoming])
+                console.log('appointment created backend: ', response.data.upcoming)
 
             }
             closeModal();
@@ -149,7 +164,7 @@ const DashboardPatient = () => {
                             <h2 className="text-2xl font-bold mb-2">Welcome, {patientData.name}!</h2>
                         </div>
                         <div className="text-right">
-                            <div className="text-3xl font-bold">{appointments.length}</div>
+                            <div className="text-3xl font-bold">{upcomingAppointments.length}</div>
                             <div className="text-blue-100 text-sm">Upcoming Appointments</div>
                         </div>
                     </div>
@@ -253,19 +268,20 @@ const DashboardPatient = () => {
 
                 {activeTab === 'appointments' && (
                     <div className="lg:col-span-3 space-y-4">
-                        {appointments.length === 0 ? (
+                        {upcomingAppointments.length === 0 ? (
                             <p className='dark:text-neutral-400'>There are no scheduled appointments..</p>
                         ) : (
-                            appointments.map((appt) => {
+                            upcomingAppointments.map((appt) => {
                                 const [date, hour] = appt.date.split('T');
                                 return (
                                     <div className="flex items-center justify-between mb-4">
                                         <div key={appt.id} className="border rounded p-4 shadow-sm">
-                                            <Edit className="w-5 h-5 text-gray-400 hover:text-gray-600 cursor-pointer" />
+                                            <Edit className="w-5 h-5 text-gray-400 hover:text-gray-600 cursor-pointer" onClick={() => {
+                                                openEditModal(appt, 'appointment', 'self');
+                                            }} />
                                             <p><strong>Date:</strong> {date} </p>
                                             <p><strong>Hour:</strong> {hour}</p>
                                             <p><strong>Specialist:</strong> {appt.odontologist.name + " " + appt.odontologist.lastname}</p>
-                                            <p><strong>Subject:</strong> {appt.reason}</p>
                                         </div>
                                     </div>
                                 );
@@ -300,30 +316,24 @@ const DashboardPatient = () => {
                 )}
 
                 {activeTab === 'history' && (
-                    <div className="lg:col-span-3">
-                        <div className="bg-white rounded-lg shadow dark:bg-gray-800">
-                            <div className="p-6 border-b border-gray-200">
-                                <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
-                            </div>
-                            <div className="divide-y divide-gray-200">
-                                {history.map((item) => (
-                                    <div key={item.id} className="p-6 hover:bg-gray-50">
-                                        <div className="flex items-start space-x-4">
-                                            <div className="flex-shrink-0">
-                                                <FileText className="w-5 h-5 text-gray-400" />
-                                            </div>
-                                            <div className="flex-1">
-                                                <h4 className="text-sm font-medium text-gray-900">{item.action}</h4>
-                                                <p className="text-sm text-gray-500">{item.details}</p>
-                                                <p className="text-xs text-gray-400 mt-1">
-                                                    {new Date(item.date).toLocaleDateString()}
-                                                </p>
-                                            </div>
+                    <div className="lg:col-span-3 space-y-4">
+                        {pastAppointments.length === 0 ? (
+                            <p className='dark:text-neutral-400'>There are no past appointments..</p>
+                        ) : (
+                            pastAppointments.map((appt) => {
+                                const [date, hour] = appt.date.split('T');
+                                return (
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div key={appt.id} className="border rounded p-4 shadow-sm">
+                                            <Edit className="w-5 h-5 text-gray-400 hover:text-gray-600 cursor-pointer" />
+                                            <p><strong>Date:</strong> {date} </p>
+                                            <p><strong>Hour:</strong> {hour}</p>
+                                            <p><strong>Specialist:</strong> {appt.odontologist.name + " " + appt.odontologist.lastname}</p>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-                        </div>
+                                );
+                            })
+                        )}
                     </div>
                 )}
             </div>

@@ -17,6 +17,6 @@ public interface IAppointmentService {
     void delete (Integer id)  throws ResourceNotFoundException;
     //HQL
     List<AppointmentResponseDto> findByDates(LocalDate startDate, LocalDate endDate);
-    List<AppointmentResponseDto> findByUserId(Integer patientId);
+    Map<String, List<AppointmentResponseDto>> findByUserId(Integer patientId);
     Map<String, List<AppointmentResponseDto>> findByOdontologistId(Integer odontologistId);
 }

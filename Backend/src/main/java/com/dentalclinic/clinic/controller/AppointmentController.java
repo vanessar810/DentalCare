@@ -55,8 +55,9 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.findByDates(startDate,endDate));
     }
     @GetMapping("/user")
-    public ResponseEntity<List<AppointmentResponseDto>> findUser(@RequestParam Integer patientId){
-        return ResponseEntity.ok(appointmentService.findByUserId(patientId));
+    public  ResponseEntity<java.util.Map<String, List<AppointmentResponseDto>>> findUser(@RequestParam Integer patientId){
+        Map<String, List<AppointmentResponseDto>> response = appointmentService.findByUserId(patientId);
+        return ResponseEntity.ok(response);
     }
     @GetMapping("/odontologist")
     public ResponseEntity<java.util.Map<String, List<AppointmentResponseDto>>> findOdontologist(@RequestParam Integer odontologistId){

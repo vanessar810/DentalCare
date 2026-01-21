@@ -13,10 +13,10 @@ import java.util.List;
 public interface OdontologistMapper {
     //Creates an Odontologist from Dto
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "user", source = "user")
-    @Mapping(target = "name", source = "user.name")
-    @Mapping(target = "lastname", source = "user.lastname")
-    @Mapping(target = "email", source = "user.email")
+    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "lastname", source = "lastname")
+    @Mapping(target = "email", source = "email")
     @Mapping(target = "phone", source = "phone")
     @Mapping(target = "license", source = "license")
     @Mapping(target = "inDate", ignore = true)

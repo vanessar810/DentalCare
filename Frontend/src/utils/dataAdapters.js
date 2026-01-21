@@ -50,6 +50,7 @@ export const adaptBackendToForm = (backendData, entityType) => {
                 date: backendData.date || '',
                 patient_id: backendData.patient.id || '',
                 odontologist_id: backendData.odontologist.id || '',
+                patient_name: `${backendData.patient.name || ''} ${backendData.patient.lastname || ''}`.trim(),
                 };             
             return adaptedAppointment;
         default:

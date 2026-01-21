@@ -20,6 +20,8 @@ const DashboardPatient = () => {
     const [formData, setFormData] = useState(null)
     const [showModal, setShowModal] = useState(false);
     const [editContext, setEditContext] = useState();
+    const [selectedId, setSelectedId] = useState();
+    const [showModal2, setShowModal2] = useState(false);
 
     const services = [
         { name: 'Health Insurance', status: 'Active', renewal: '2025-12-31' },
@@ -79,7 +81,7 @@ const DashboardPatient = () => {
                 const appointmentsResponse = await api.get('/appointment/user', {
                     params: { patientId }
                 });
-                console.log('data from appoinments:', appointmentsResponse.data)
+                //console.log('data from appoinments:', appointmentsResponse.data)
                 setPastAppointments(appointmentsResponse.data.past)
                 setUpcomingAppointments(appointmentsResponse.data.upcoming)
             } catch (error) {
@@ -111,11 +113,9 @@ const DashboardPatient = () => {
 
     };
     const openCreateModal = () => {
-        setIsEditingProfile(false);
         setIsCreatingAppointment(true);
-        setFormData({ patient_id: patientData.id });
-
-
+        console.log(' IsCreatingAppointment:', isCreatingAppointment);
+        setFormData({ patient_id: patientData.id, patient_name: `${patientData.name} ${patientData.lastname }`});
     };
 
     const onFormSubmit = async (entityFormData) => {
@@ -136,8 +136,8 @@ const DashboardPatient = () => {
             } else {
                 //patient creating an appointment
                 const response = await api.post('appointment', backendData)
-                setUpcomingAppointments([...upcomingAppointments, response.data.upcoming])
-                console.log('appointment created backend: ', response.data.upcoming)
+                setUpcomingAppointments([...upcomingAppointments, response.data])
+                console.log('appointment created backend: ', response.data)
 
             }
             closeModal();
@@ -145,6 +145,23 @@ const DashboardPatient = () => {
         } catch (error) {
             console.error("Error updating data: ", error);
             alert("There was an error updating your details");
+        }
+    };
+    const handleCancelClick = (id) => {
+        setSelectedId(id);
+        console.log('id: ',id)
+        setShowModal2(true);
+    }
+    const confirmDelete = async () => {
+        try{
+            if(selectedId){
+                const response = await api.delete(`/appointment/${selectedId}`);
+                console.log('appointmed successfully deleted', response)
+            }
+        setShowModal2(false);
+        setSelectedId(null);
+        } catch(error){
+            console.error("error deleting appointment", error);
         }
     };
     const getServiceStatus = (status) => {
@@ -174,7 +191,7 @@ const DashboardPatient = () => {
             {/* Navigation Tabs */}
             <div className="mb-6">
                 <div className="border-b border-gray-200">
-                    <nav className="-mb-px flex space-x-8">
+                    <nav className="-mb-px flex space-x-8 overflow-x-auto scrollbar-hide">
                         {[
                             { id: 'overview', label: 'Overview', icon: User2 },
                             { id: 'appointments', label: 'Appointments', icon: Calendar },
@@ -267,18 +284,24 @@ const DashboardPatient = () => {
                 )}
 
                 {activeTab === 'appointments' && (
-                    <div className="lg:col-span-3 space-y-4">
+                    <div className="lg:col-span-3 grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
                         {upcomingAppointments.length === 0 ? (
                             <p className='dark:text-neutral-400'>There are no scheduled appointments..</p>
                         ) : (
                             upcomingAppointments.map((appt) => {
                                 const [date, hour] = appt.date.split('T');
                                 return (
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div key={appt.id} className="border rounded p-4 shadow-sm">
+                                    <div key={appt.id} className="border rounded p-4 shadow-sm flex flex-col gap-3">
+                                        <div className="flex justify-between items-center">
                                             <Edit className="w-5 h-5 text-gray-400 hover:text-gray-600 cursor-pointer" onClick={() => {
                                                 openEditModal(appt, 'appointment', 'self');
                                             }} />
+                                            <button onClick={() => handleCancelClick(appt.id)}
+                                                className="text-red-200 hover:text-red-400">
+                                                Cancel
+                                            </button>
+                                        </div>
+                                        <div className="text-sm">
                                             <p><strong>Date:</strong> {date} </p>
                                             <p><strong>Hour:</strong> {hour}</p>
                                             <p><strong>Specialist:</strong> {appt.odontologist.name + " " + appt.odontologist.lastname}</p>
@@ -323,9 +346,8 @@ const DashboardPatient = () => {
                             pastAppointments.map((appt) => {
                                 const [date, hour] = appt.date.split('T');
                                 return (
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div key={appt.id} className="border rounded p-4 shadow-sm">
-                                            <Edit className="w-5 h-5 text-gray-400 hover:text-gray-600 cursor-pointer" />
+                                    <div key={appt.id} className="flex items-center justify-between mb-4">
+                                        <div className="border rounded p-4 shadow-sm">
                                             <p><strong>Date:</strong> {date} </p>
                                             <p><strong>Hour:</strong> {hour}</p>
                                             <p><strong>Specialist:</strong> {appt.odontologist.name + " " + appt.odontologist.lastname}</p>
@@ -337,9 +359,10 @@ const DashboardPatient = () => {
                     </div>
                 )}
             </div>
+
             <FormModal
                 isOpen={showModal}
-                title={`${isEditingProfile ? 'Edit your information' : 'Create appointment'}`}
+                title={`${isEditingProfile ? 'Edit your information' : isCreatingAppointment ? 'Create appointment' : isEditingAppointment ? 'Edit your appointment' : ''}`}
                 onClose={closeModal}
             >
                 <EntityForm
@@ -348,8 +371,38 @@ const DashboardPatient = () => {
                     onSubmit={onFormSubmit}
                     onCancel={closeModal}
                     editContext="self"
+                    mode ={isEditingProfile ? 'edit' : isEditingAppointment ? 'edit' : isCreatingAppointment ? 'create':''}
                 />
             </FormModal>
+
+            {/* modal de confirmación */}
+            {showModal2 && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+                    <div className="bg-white dark:bg-neutral-800 p-6 rounded-lg shadow-lg w-[90%] max-w-sm">
+                        <h2 className="text-lg font-semibold mb-4">Cancel appointment</h2>
+                        <p className="text-sm mb-6 text-gray-600 dark:text-neutral-300">
+                            Are you sure you want to cancel this appointment?
+                        </p>
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => {
+                                    setShowModal2(false);
+                                    setSelectedId(null); 
+                                }}
+                                className="px-4 py-2 text-sm rounded bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600"
+                            >
+                                No
+                            </button>
+                            <button
+                                onClick={confirmDelete}
+                                className="px-4 py-2 text-sm rounded bg-red-500 hover:bg-red-600 text-white"
+                            >
+                                Yes, cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -20,8 +20,8 @@ export const getFieldConfigs = (modalMode = 'create', editContext ='admin') =>({
         { field: 'license', label: 'License', type: 'text', required: true, disabled: editContext === 'self' },
         ],
     appointment: [
-        { field: 'patient_id', label: 'Patient ID', type: 'number', required: true, disabled: editContext === 'self'},
-        { field: 'odontologist_id', label: 'Odontologist ID', type: 'number', required: true },
+        { field: 'patient_id', label: 'Patient', type: 'number', required: true, disabled: editContext === 'self'},
+        { field: 'odontologist_id', label: 'Odontologist', type: 'number', required: true },
         { field: 'date', label: 'Date', type: 'datetime-local', required: true },
        // { field: 'description', label: 'Description', type: 'text', required: false },
        //{ field: 'status', label: 'Status', type: 'select', required: true, options: ['SCHEDULED', 'COMPLETED', 'CANCELLED'] },

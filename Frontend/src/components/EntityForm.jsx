@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getEntityFields, getNestedValue, setNestedValue, validateField } from "../utils/fieldConfigs";
+import api from '../services/api';
 //Generic form handling
 const EntityForm = ({
     entityType,
@@ -7,13 +8,30 @@ const EntityForm = ({
     onSubmit,
     onCancel,
     editContext,
+    mode = null,
 }) => {
     const [formData, setFormData] = useState({});
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
+    const [odontologists, setOdontologists] = useState([])
 
-    const modalMode = initialData ? 'edit' : 'create';
+    const modalMode = mode || (initialData ? 'edit' : 'create');
+    console.log('mode: ', modalMode)
     const fields = getEntityFields(entityType, modalMode, editContext);;
+
+    useEffect(() => {
+        if (entityType === "appointment") {
+            const fetchOdontologists = async () => {
+                try {
+                    const response = await api.get("/odontologist");
+                    setOdontologists(response.data);
+                } catch (error) {
+                    console.error("Error fetching odontologists:", error);
+                }
+            };
+            fetchOdontologists();
+        }
+    }, [entityType]);
 
     // Función para hacer copia profunda
     const deepClone = (obj) => {
@@ -36,7 +54,7 @@ const EntityForm = ({
         //console.log('🔍 4. Campos esperados:', fields.map(f => f.field));
         if (initialData && Object.keys(initialData).length > 0) {
             setFormData(deepClone(initialData));
-            //console.log('🔍 5. FormData después de cargar:', deepClone(initialData));
+            console.log('🔍 5. FormData después de cargar:', deepClone(initialData));
         } else {
             // Valores por defecto para campos anidados
             const defaultValues = {};
@@ -90,7 +108,6 @@ const EntityForm = ({
                 isValid = false;
             }
         });
-
         setErrors(newErrors);
         return isValid;
     };
@@ -126,6 +143,38 @@ const EntityForm = ({
             className: `w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${hasError ? 'border-red-500' : 'border-gray-300'
                 }`,
         };
+        //shows a list of odontologist in appointment form
+        if (fieldConfig.field === "odontologist_id") {
+            return (
+                <select {...commonProps}>
+                    <option value="">
+                        select an odontologist
+                    </option>
+                    {odontologists.length === 0 ? (
+                        <option disabled>Loading...</option>
+                    ) : (
+                        odontologists.map((od) => (
+                            <option key={od.id} value={od.id}>
+                                {od.name} {od.lastname}
+                            </option>
+                        ))
+                    )}
+                </select>
+            );
+        }
+        // show name in appointment form in DashboardPatient
+        if (fieldConfig.field === 'patient_id' && editContext === 'self') {
+            const patientName = `${formData.patient_name || ''}`;
+            return (
+                <input
+                    {...commonProps}
+                    type="text"
+                    value={patientName || "—"}
+                    readOnly
+                    className="w-full px-3 py-2 border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                />
+            );
+        }
         switch (fieldConfig.type) {
             case 'select':
                 return (
@@ -182,11 +231,16 @@ const EntityForm = ({
             {/* Header informativo */}
             <div className="mb-4 p-3 bg-blue-50 rounded-lg">
                 <p className="text-sm text-blue-700">
-                    {initialData ?
+                    {modalMode === 'edit' ?
                         `Editing ${entityType}: ${getNestedValue(formData, 'user.name') || 'Sin nombre'}` :
                         `Creating new ${entityType}`
                     }
                 </p>
+                {entityType === 'appointment' && formData.patient_name && (
+                    <p className="text-sm text-blue-500 mt-1">
+                        Patient: {formData.patient_name}
+                    </p>
+                )}
                 <p className="text-xs text-blue-600">
                     Mode: {modalMode} | fields: {fields.length}
                 </p>
@@ -227,7 +281,7 @@ const EntityForm = ({
                     disabled={isLoading}
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                 >
-                    {isLoading ? 'Saving...' : (initialData ? 'Update' : 'Create')}
+                    {isLoading ? 'Saving...' : modalMode}
                 </button>
             </div>
         </div>

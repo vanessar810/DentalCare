@@ -17,7 +17,8 @@ const DashboardPatient = () => {
     const [isEditingProfile, setIsEditingProfile] = useState(false);
     const [isCreatingAppointment, setIsCreatingAppointment] = useState(false);
     const [isEditingAppointment, setIsEditingAppointment] = useState(false);
-    const [formData, setFormData] = useState(null)
+    const [formData, setFormData] = useState(null);
+    const [originalData, setOriginalData] = useState(null); 
     const [showModal, setShowModal] = useState(false);
     const [editContext, setEditContext] = useState();
     const [selectedId, setSelectedId] = useState();
@@ -102,6 +103,7 @@ const DashboardPatient = () => {
         //console.log('🔍 1. Original item', item, 'entityType: ', type);
         const adaptedItem = adaptBackendToForm(item, type);
         //console.log('2. Adapted item:', adaptedItem);
+        setOriginalData(adaptedItem);
         setIsCreatingAppointment(false);
         if (type === 'patient') {
             setIsEditingProfile(true);
@@ -114,7 +116,6 @@ const DashboardPatient = () => {
     };
     const openCreateModal = () => {
         setIsCreatingAppointment(true);
-        console.log(' IsCreatingAppointment:', isCreatingAppointment);
         setFormData({ patient_id: patientData.id, patient_name: `${patientData.name} ${patientData.lastname }`});
     };
 
@@ -122,7 +123,7 @@ const DashboardPatient = () => {
         const backendData = adaptFormToBackend(entityFormData, entityType, isEditingProfile || isEditingAppointment);
         //console.log('PatientToBackend: ', backendData)
         try {
-            if (isEditingProfile) {
+            if (isEditingProfile ) {
                 //patient editing its profile
                 const response = await api.put('/patient/me', backendData);
                 setPatientData(response.data)
@@ -368,6 +369,7 @@ const DashboardPatient = () => {
                 <EntityForm
                     entityType={entityType}
                     initialData={formData}
+                    originalData={originalData}
                     onSubmit={onFormSubmit}
                     onCancel={closeModal}
                     editContext="self"

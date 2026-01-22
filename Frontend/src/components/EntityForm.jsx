@@ -5,6 +5,7 @@ import api from '../services/api';
 const EntityForm = ({
     entityType,
     initialData = null,
+    originalData = null, 
     onSubmit,
     onCancel,
     editContext,
@@ -13,10 +14,11 @@ const EntityForm = ({
     const [formData, setFormData] = useState({});
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
-    const [odontologists, setOdontologists] = useState([])
+    const [odontologists, setOdontologists] = useState([]);
+    const [hasChanges, setHasChanges] = useState(false);
 
     const modalMode = mode || (initialData ? 'edit' : 'create');
-    console.log('mode: ', modalMode)
+    //console.log('mode: ', modalMode)
     const fields = getEntityFields(entityType, modalMode, editContext);;
 
     useEffect(() => {
@@ -54,7 +56,7 @@ const EntityForm = ({
         //console.log('🔍 4. Campos esperados:', fields.map(f => f.field));
         if (initialData && Object.keys(initialData).length > 0) {
             setFormData(deepClone(initialData));
-            console.log('🔍 5. FormData después de cargar:', deepClone(initialData));
+           // console.log('🔍 5. FormData después de cargar:', deepClone(initialData));
         } else {
             // Valores por defecto para campos anidados
             const defaultValues = {};
@@ -71,6 +73,22 @@ const EntityForm = ({
         setErrors({});
 
     }, [initialData]);
+
+    useEffect(() => {
+    if (modalMode === 'edit' && originalData) {
+        const formStr = JSON.stringify(formData);
+        const originalStr = JSON.stringify(originalData);
+        
+        // console.log('🔍 Comparing:');
+        // console.log('FormData:', formStr);
+        // console.log('OriginalData:', originalStr);
+        // console.log('Are equal?:', formStr === originalStr);
+        
+        setHasChanges(formStr !== originalStr);
+    } else {
+        setHasChanges(true);
+    }
+}, [formData, originalData, modalMode]);
 
     const handleInputChange = (fieldPath, value) => {
         setFormData(prev => {
@@ -278,7 +296,7 @@ const EntityForm = ({
                 <button
                     type="button"
                     onClick={handleSubmit}
-                    disabled={isLoading}
+                    disabled={isLoading || (modalMode === 'edit' && !hasChanges)}
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
                 >
                     {isLoading ? 'Saving...' : modalMode}

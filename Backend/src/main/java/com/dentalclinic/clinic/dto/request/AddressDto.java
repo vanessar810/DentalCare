@@ -9,6 +9,6 @@ import lombok.*;
 @ToString
 public class AddressDto {
     private String street;
-    private int number;
+    private String number;
     private String neighborhood;
 }

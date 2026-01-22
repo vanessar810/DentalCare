@@ -22,7 +22,11 @@ const User = () => {
   const handleAddUser = async (e) => {
     e.preventDefault();
     console.log("creating patient")
-    if (!validateForm(newUser.email, newUser.password)) return;
+    const validationErrors = validateForm(newUser);
+    if(Object.keys(validationErrors).length > 0){
+      setErrors(validationErrors)
+      return;
+    }
     setIsLoading(true);
     try {
       const {data} = await api.post('/auth/register', newUser);
@@ -65,16 +69,27 @@ const User = () => {
               className="w-full p-3 border rounded-lg dark:bg-gray-300 dark:text-blue-800"
               required
             />
+            {errors.name && (
+              <div className="flex items-center mt-2 text-red-600 text-sm">
+                <AlertCircle className="w-4 h-4 mr-1" />
+                {errors.name}
+              </div>
+            )}
             <input
               type="text"
               name="lastname"
               placeholder="Lastname"
               value={newUser.lastname}
               onChange={(e) => setNewUser({ ...newUser, lastname: e.target.value })}
-
               className="w-full p-3 border rounded-lg dark:bg-gray-300"
               required
             />
+            {errors.lastname && (
+              <div className="flex items-center mt-2 text-red-600 text-sm">
+                <AlertCircle className="w-4 h-4 mr-1" />
+                {errors.lastname}
+              </div>
+            )}
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Mail className="h-5 w-5 text-gray-400" />

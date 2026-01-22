@@ -37,7 +37,7 @@ class PatientServiceTest{
         patient.setInDate(LocalDate.of(2025,04,07));
         Address address = new Address();
         address.setStreet("Trois Frères");
-        address.setNumber(58);
+        address.setNumber("58");
         address.setNeighborhood("Montmartre");
         patient.setAddress(address);
     }

@@ -1,5 +1,5 @@
 import CrudOperations from '../hooks/CrudOperations';
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { appointmentValidateForm, getAppoinmentInitialFormData } from '../utils/appointmentValidateForm';
 import { patientValidateForm, getPatientInitialFormData } from '../utils/patientValidateForm';
 import { odontologistValidateForm, getOdontologistInitialFormData } from '../utils/odontologistValidateForm';
@@ -59,9 +59,30 @@ const EntityManager = ({ entityType, onBack }) => {
         validateForm: config.validateForm
     })
 
+    useEffect(() => {
+        get();
+    }, [entityType]);
+
 
     //filter based on search
     const filteredData = useMemo(() => {
+        // if(!data) return {upcoming: [], past:[]};
+        // //for appoinments
+        // if (entityType === 'appointment'){
+        //     const filterList = (list) => {
+        //         if (!Array.isArray(list)) return [];
+        //         return list.filter(item => {
+        //             const searchableFields = Object.values(item).join('').toLowerCase();
+        //             return searchableFields.includes(searchTerm.toLowerCase());
+        //         });
+        //     }
+        //     return {
+        //         upcoming:filterList(data.upcoming || []),
+        //         past: filterList(data.past || [])
+        //     };
+        // }
+
+        //for others entities
         if (!data || !Array.isArray(data)) {
             // console.log('🔍 Data is not an array:', data);
             return [];
@@ -156,13 +177,38 @@ const EntityManager = ({ entityType, onBack }) => {
             </div>
 
             <div className="rounded-lg shadow-sm">
-                <DataTable
-                    entityType={entityType}
-                    data={filteredData}
-                    loading={loading}
-                    onEdit={openEditModal}
-                    onDelete={handleDelete}
-                />
+                {entityType === 'GUS' ? (
+                    <div className="space-y-6">
+                        <div>
+                            <h3 className="text-lg font-semibold mb-3 text-gray-700">Upcoming Appointments</h3>
+                            <DataTable
+                                entityType={entityType}
+                                data={filteredData.upcoming}
+                                loading={loading}
+                                onEdit={openEditModal}
+                                onDelete={handleDelete}
+                            />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-semibold mb-3 text-gray-700">Past Appointments</h3>
+                            <DataTable
+                                entityType={entityType}
+                                data={filteredData.past}
+                                loading={loading}
+                                onEdit={openEditModal}
+                                onDelete={handleDelete}
+                            />
+                        </div> 
+                    </div>
+                ) : (
+                    <DataTable
+                        entityType={entityType}
+                        data={filteredData}
+                        loading={loading}
+                        onEdit={openEditModal}
+                        onDelete={handleDelete}
+                    />
+                )}                
             </div>
 
             <FormModal

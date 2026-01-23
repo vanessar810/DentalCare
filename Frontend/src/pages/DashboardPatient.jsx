@@ -5,8 +5,6 @@ import { User2, Calendar, Settings, Clock, FileText, ChevronRight, Bell, Edit } 
 import FormModal from "../components/FormModal";
 import EntityForm from "../components/EntityForm";
 import { adaptBackendToForm, adaptFormToBackend } from '../utils/dataAdapters';
-import { patientValidateForm, getPatientInitialFormData } from '../utils/patientValidateForm';
-import { appointmentValidateForm, getAppoinmentInitialFormData } from '../utils/appointmentValidateForm';
 
 const DashboardPatient = () => {
     const [activeTab, setActiveTab] = useState('overview');
@@ -18,7 +16,7 @@ const DashboardPatient = () => {
     const [isCreatingAppointment, setIsCreatingAppointment] = useState(false);
     const [isEditingAppointment, setIsEditingAppointment] = useState(false);
     const [formData, setFormData] = useState(null);
-    const [originalData, setOriginalData] = useState(null); 
+    const [originalData, setOriginalData] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [editContext, setEditContext] = useState();
     const [selectedId, setSelectedId] = useState();
@@ -44,33 +42,9 @@ const DashboardPatient = () => {
     useEffect(() => {
         if (isEditingProfile || isCreatingAppointment || isEditingAppointment) {
             setShowModal(true);
-            console.log(entityType)
+            //console.log(entityType)
         }
     }, [isEditingProfile, isCreatingAppointment, isEditingAppointment]);
-
-    const getEntityConfig = (type) => {
-        const configs = {
-            patient: {
-                validateForm: patientValidateForm,
-                getInitialFormData: getPatientInitialFormData,
-                singularName: 'Patient',
-                pluralName: 'Patients'
-            },
-            appointment: {
-                validateForm: appointmentValidateForm,
-                getInitialFormData: getAppoinmentInitialFormData,
-                singularName: 'Appointment',
-                pluralName: 'Appointments'
-            }
-        };
-
-        const config = configs[type];
-        if (!config) {
-            throw new Error(`Unsupported entity type: ${type}`);
-        }
-        return config;
-    };
-    const config = entityType ? getEntityConfig(entityType) : null;
 
     useEffect(() => {
         const fetchData = async () => {
@@ -116,14 +90,26 @@ const DashboardPatient = () => {
     };
     const openCreateModal = () => {
         setIsCreatingAppointment(true);
-        setFormData({ patient_id: patientData.id, patient_name: `${patientData.name} ${patientData.lastname }`});
+        setFormData({ patient_id: patientData.id, patient_name: `${patientData.name} ${patientData.lastname}` });
     };
 
     const onFormSubmit = async (entityFormData) => {
         const backendData = adaptFormToBackend(entityFormData, entityType, isEditingProfile || isEditingAppointment);
         //console.log('PatientToBackend: ', backendData)
+        const selectedDate = new Date(entityFormData.date);
+        const hours = selectedDate.getHours();
+        const day = selectedDate.getDay();
+        //console.log('hora  y dia cita: ', hours, day)
+        if (hours < 6 || hours > 20) {
+            alert("Appointments can only be scheduled between 6:00 AM and 8:00 PM.");
+            return;
+        }
+        if (day === 0) {
+                alert("Appointments cannot be scheduled on Sundays.");
+                return;
+            }
         try {
-            if (isEditingProfile ) {
+            if (isEditingProfile) {
                 //patient editing its profile
                 const response = await api.put('/patient/me', backendData);
                 setPatientData(response.data)
@@ -131,14 +117,16 @@ const DashboardPatient = () => {
                 console.log("Information successfully updated");
             } else if (isEditingAppointment) {
                 const response = await api.put(`/appointment/${formData.id}`, backendData);
-                setUpcomingAppointments(upcomingAppointments.map(appt =>
-                    appt.id === formData.id ? response.data : appt
-                ));
+                const patientId = patientData.id;
+                const appointmentsResponse = await api.get('/appointment/user', {
+                    params: { patientId }
+                });
+                setUpcomingAppointments(appointmentsResponse.data.upcoming);
             } else {
                 //patient creating an appointment
                 const response = await api.post('appointment', backendData)
                 setUpcomingAppointments([...upcomingAppointments, response.data])
-                console.log('appointment created backend: ', response.data)
+                //console.log('appointment created backend: ', response.data)
 
             }
             closeModal();
@@ -150,18 +138,21 @@ const DashboardPatient = () => {
     };
     const handleCancelClick = (id) => {
         setSelectedId(id);
-        console.log('id: ',id)
+        //console.log('id: ', id)
         setShowModal2(true);
     }
     const confirmDelete = async () => {
-        try{
-            if(selectedId){
+        try {
+            if (selectedId) {
                 const response = await api.delete(`/appointment/${selectedId}`);
                 console.log('appointmed successfully deleted', response)
+                setUpcomingAppointments(prev =>
+                    prev.filter(appt => appt.id !== selectedId)
+                );
             }
-        setShowModal2(false);
-        setSelectedId(null);
-        } catch(error){
+            setShowModal2(false);
+            setSelectedId(null);
+        } catch (error) {
             console.error("error deleting appointment", error);
         }
     };
@@ -373,7 +364,7 @@ const DashboardPatient = () => {
                     onSubmit={onFormSubmit}
                     onCancel={closeModal}
                     editContext="self"
-                    mode ={isEditingProfile ? 'edit' : isEditingAppointment ? 'edit' : isCreatingAppointment ? 'create':''}
+                    mode={isEditingProfile ? 'edit' : isEditingAppointment ? 'edit' : isCreatingAppointment ? 'create' : ''}
                 />
             </FormModal>
 
@@ -389,7 +380,7 @@ const DashboardPatient = () => {
                             <button
                                 onClick={() => {
                                     setShowModal2(false);
-                                    setSelectedId(null); 
+                                    setSelectedId(null);
                                 }}
                                 className="px-4 py-2 text-sm rounded bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:hover:bg-neutral-600"
                             >

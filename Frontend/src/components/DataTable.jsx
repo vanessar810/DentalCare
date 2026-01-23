@@ -46,7 +46,7 @@ const DataTable = ({ entityType, data, loading, onEdit, onDelete }) => {
         appointment: {
             headers: ['ID', 'Patient ID', 'Patient name','Odontologist ID', 'Odontologist name', 'Date', 'Actions'],
             renderRow: (item) => {    
-                if (!item) 
+                if (!item || !item.patient || !item.odontologist)  
                     return ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'];           
                 return [
                     item.id,

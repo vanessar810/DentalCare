@@ -10,8 +10,16 @@ const useApi = (endpoint) => {
         setLoading(true);
         try {
             const response = await api.get(endpoint);
+            if (endpoint.includes('/appointmentss')) {
+                setData({
+                    upcoming: response.data.upcoming || [],
+                    past: response.data.past || []
+                });
+            } else {
+                setData(response.data);
+            }
             setData(response.data);
-            
+            console.log('use api get: ', response.data, endpoint)
         } catch (err) {
             setError(err);
         } finally {

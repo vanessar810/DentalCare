@@ -64,13 +64,13 @@ const Login = () => {
           <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <Lock className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-neutral-400">Welcome</h2>
-          <p className="text-gray-600 mt-2 dark:text-neutral-400">Sign in to your account</p>
+          <h2 className="text-3xl font-bold text-blue-900 dark:text-neutral-400">Welcome</h2>
+          <p className="text-blue-900 mt-2 dark:text-neutral-400">Sign in to your account</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Email Field */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2 dark:text-neutral-400">
+            <label htmlFor="email" className="block text-sm font-medium text-blue-900 mb-2 dark:text-neutral-400">
               Email Address
             </label>
             <div className="relative">
@@ -98,7 +98,7 @@ const Login = () => {
           </div>
           {/* Password Field */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2 dark:text-neutral-400">
+            <label htmlFor="password" className="block text-sm font-medium text-blue-900 mb-2 dark:text-neutral-400">
               Password
             </label>
             <div className="relative">

@@ -19,7 +19,7 @@ const useApi = (endpoint) => {
                 setData(response.data);
             }
             setData(response.data);
-            console.log('use api get: ', response.data, endpoint)
+            //console.log('use api get: ', response.data, endpoint)
         } catch (err) {
             setError(err);
         } finally {

@@ -76,8 +76,20 @@ const EntityForm = ({
 
     useEffect(() => {
     if (modalMode === 'edit' && originalData) {
-        const formStr = JSON.stringify(formData);
-        const originalStr = JSON.stringify(originalData);
+        const formDataCopy = { ...formData };
+        const originalDataCopy = { ...originalData };
+
+        if (formDataCopy.user) {
+            const { password, ...userWithoutPassword } = formDataCopy.user;
+            formDataCopy.user = userWithoutPassword;
+        }
+        if (originalDataCopy.user) {
+            const { password, ...userWithoutPassword } = originalDataCopy.user;
+            originalDataCopy.user = userWithoutPassword;
+        }
+
+        const formStr = JSON.stringify(formDataCopy);
+        const originalStr = JSON.stringify(originalDataCopy);
         
         // console.log('🔍 Comparing:');
         // console.log('FormData:', formStr);
@@ -117,7 +129,7 @@ const EntityForm = ({
         fields.forEach(fieldConfig => {
             const value = getNestedValue(formData, fieldConfig.field);
             if (fieldConfig.required && (!value || value.toString().trim() === '')) {
-                newErrors[fieldConfig.field] = `${fieldConfig.label} es requerido`;
+                newErrors[fieldConfig.field] = `${fieldConfig.label} is required`;
                 isValid = false;
             }
             const fieldErrors = validateField(fieldConfig, value);
@@ -250,7 +262,7 @@ const EntityForm = ({
             <div className="mb-4 p-3 bg-blue-50 rounded-lg">
                 <p className="text-sm text-blue-700">
                     {modalMode === 'edit' ?
-                        `Editing ${entityType}: ${getNestedValue(formData, 'user.name') || 'Sin nombre'}` :
+                        `Editing ${entityType}: ${getNestedValue(formData, 'user.name') ||  formData.patient_name || 'No name'}` :
                         `Creating new ${entityType}`
                     }
                 </p>

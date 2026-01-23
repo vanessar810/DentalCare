@@ -167,13 +167,13 @@ const DashboardPatient = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Role and Quick Stats */}
             <div className="mb-8">
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white">
+                <div className="bg-gradient-to-r from-blue-700 to-purple-900 rounded-lg p-6 text-white">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h2 className="text-2xl font-bold mb-2">Welcome, {patientData.name}!</h2>
+                            <h2 className="text-2xl font-bold mb-2 text-blue-100">Welcome, {patientData.name}!</h2>
                         </div>
                         <div className="text-right">
-                            <div className="text-3xl font-bold">{upcomingAppointments.length}</div>
+                            <div className="text-3xl font-bold text-blue-100">{upcomingAppointments.length}</div>
                             <div className="text-blue-100 text-sm">Upcoming Appointments</div>
                         </div>
                     </div>

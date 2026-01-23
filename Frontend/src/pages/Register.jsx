@@ -55,10 +55,10 @@ const User = () => {
   return (
     <div className="container mx-auto p-6 flex justify-center">
       <div className="text-center">
-        <h2 className="text-3xl font-bold mb-6 dark:text-white"> Registration form</h2>
+        <h2 className="text-3xl font-bold mb-6 text-blue-900 dark:text-neutral-400"> Registration form</h2>
 
         <div className="max-w-lg bg-white p-6 rounded-lg shadow-md dark:bg-gray-800">
-          <h3 className="text-xl font-semibold mb-4 dark:text-neutral-400">Add New Patient</h3>
+          <h3 className="text-xl font-semibold mb-4 text-blue-900 dark:text-neutral-400">Add New Patient</h3>
           <form onSubmit={handleAddUser} className="space-y-4">
             <input
               type="text"
@@ -134,7 +134,7 @@ const User = () => {
                 )}
               </button>
             </div>
-            <button type="submit" className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 dark:text-neutral-400"
+            <button type="submit" className="w-full bg-blue-800 text-white p-3 rounded-lg hover:bg-blue-700 dark:text-neutral-400"
               disabled={isLoading}>
               {isLoading ? 'Creating...' : 'Create'}
             </button>

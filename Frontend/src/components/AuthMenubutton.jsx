@@ -47,17 +47,17 @@ export default function AuthMenuButton() {
         onFocus={openMenu}
         aria-haspopup="true"
         aria-expanded={open}
-        className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring"
+        className="px-4 py-2 rounded-md text-blue-900 dark:text-neutral-400 bg-amber-40 hover:bg-blue-100 focus:outline-none focus:ring"
       >
         user
       </button>
 
       {/* Menú desplegable */}
       {open && (
-        <div className="absolute w-30 bg-indigo-200 rounded-md shadow-lg py-2 z-50 dark:bg-black" onMouseLeave={closeMenu}>
+        <div className="absolute w-30 bg-ambar-40 rounded-md shadow-lg py-2 z-50 dark:bg-black" onMouseLeave={closeMenu}>
           <Link
             to="/login"
-            className="block px-4 py-2 text-gray-700 hover:bg-indigo-50"
+            className="block px-4 py-2 text-blue-900 hover:bg-indigo-50 dark:text-neutral-400"
             onClick={() => setOpen(false)}
           >
             Login
@@ -65,7 +65,7 @@ export default function AuthMenuButton() {
 
           <Link
             to="/register"
-            className="block px-4 py-2 text-gray-700 hover:bg-indigo-50"
+            className="block px-4 py-2 text-blue-900 hover:bg-indigo-50 dark:text-neutral-400"
             onClick={() => setOpen(false)}
           >
             Sign in
@@ -75,7 +75,7 @@ export default function AuthMenuButton() {
             onClick={() => {
               handleLogout();
             }}
-            className="block px-4 py-2 text-gray-700 hover:bg-indigo-50"
+            className="block px-4 py-2 text-blue-900 hover:bg-indigo-50 dark:text-neutral-400"
           >
             Logout
           </button>

@@ -22,14 +22,14 @@ const User = () => {
   const handleAddUser = async (e) => {
     e.preventDefault();
     console.log("creating patient")
-    const validationErrors = validateForm(newUser);
-    if(Object.keys(validationErrors).length > 0){
+    const validationErrors = await validateForm(newUser);
+    if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors)
       return;
     }
     setIsLoading(true);
     try {
-      const {data} = await api.post('/auth/register', newUser);
+      const { data } = await api.post('/auth/register', newUser);
       storeToken(data.token);
       console.log("successful register")
 
@@ -100,18 +100,17 @@ const User = () => {
                 placeholder="Email"
                 value={newUser.email}
                 onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-
                 className="w-full pl-10 pr-4 py-3 border rounded-lg dark:bg-gray-300"
               />
+              {errors.email && (
+                <div className="flex items-center mt-2 text-red-600 text-sm">
+                  <AlertCircle className="w-4 h-4 mr-1" />
+                  {errors.email}
+                </div>
+              )}
             </div>
-            {errors.email && (
-              <div className="flex items-center mt-2 text-red-600 text-sm">
-                <AlertCircle className="w-4 h-4 mr-1" />
-                {errors.email}
-              </div>
-            )}
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <div className="relative w-full ">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3">
                 <Lock className="h-5 w-5 text-gray-400" />
               </div>
               <input
@@ -119,13 +118,13 @@ const User = () => {
                 placeholder="password"
                 value={newUser.password}
                 onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                className={`w-full pl-10 pr-12 py-3 border rounded-lg dark:bg-gray-300
-              ${errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300'}`}
+                className={`w-full py-2.5 pl-10 pr-10 rounded-lg border dark:bg-gray-300
+              ${errors.password ? 'border-red-300 bg-red-50 focus:ring-red-500' : 'border-gray-300'}`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                className="absolute inset-y-0 right-0 flex items-center pr-3"
               >
                 {showPassword ? (
                   <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
@@ -134,6 +133,12 @@ const User = () => {
                 )}
               </button>
             </div>
+            {errors.password && (
+              <div className="flex items-center mt-2 text-red-600 text-sm">
+                <AlertCircle className="w-4 h-4 mr-1" />
+                {errors.password}
+              </div>
+            )}
             <button type="submit" className="w-full bg-blue-800 text-white p-3 rounded-lg hover:bg-blue-700 dark:text-neutral-400"
               disabled={isLoading}>
               {isLoading ? 'Creating...' : 'Create'}

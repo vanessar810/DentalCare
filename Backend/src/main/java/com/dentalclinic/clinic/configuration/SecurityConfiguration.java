@@ -27,6 +27,7 @@ public class SecurityConfiguration {
                             auth.requestMatchers("/api/v1/auth/login").permitAll();
                             auth.requestMatchers("/api/v1/auth/register").permitAll();
                             auth.requestMatchers(HttpMethod.GET, "/odontologist/**").permitAll();
+                            auth.requestMatchers(HttpMethod.GET, "/api/email/verify").permitAll();
                             // endpoints swagger
                             auth.requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll();
                             auth.requestMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll();

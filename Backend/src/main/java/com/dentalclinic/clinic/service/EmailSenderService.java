@@ -25,7 +25,7 @@ public class EmailSenderService {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(appointment.getPatient().getEmail());
-            message.setSubject("✅ Confirmación de Cita - " + clinicName);
+            message.setSubject("✅ Appointment confirmation - " + clinicName);
 
             String emailBody = buildAppointmentConfirmationBody(appointment);
             message.setText(emailBody);
@@ -61,12 +61,12 @@ public class EmailSenderService {
         String formattedDate = appointment.getDate();
 
         return String.format(
-                "Dear/a %s %s,\n\n" +
+                "Dear %s %s,\n\n" +
                         "Your appointment is successfully confirmed.\n\n" +
                         "📅 Appointment details:\n" +
                         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
                         "Date: %s\n" +
-                        "Dentist: Dr/a. %s %s\n" +
+                        "Dentist: Dr. %s %s\n" +
                         "Clinic: %s\n" +
                         "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
                         "please arrive 10 minutes earlier.\n\n" +

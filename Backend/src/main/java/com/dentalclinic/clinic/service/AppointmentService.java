@@ -1,5 +1,6 @@
 package com.dentalclinic.clinic.service;
 
+import com.dentalclinic.clinic.configuration.AppointmentMapper;
 import com.dentalclinic.clinic.dto.request.AppointmentRequestDto;
 import com.dentalclinic.clinic.dto.response.AppointmentResponseDto;
 import com.dentalclinic.clinic.dto.response.OdontologistResponseDto;
@@ -27,13 +28,15 @@ public class AppointmentService implements IAppointmentService{
     private IOdontologistRepository odontologistRepository;
     private ModelMapper modelMapper;
     private EmailSenderService emailSenderService;
+    private AppointmentMapper appointmentMapper;
 
-    public AppointmentService(IAppointmentRepository appointmentRepository, IPatientRepository patientRepository, IOdontologistRepository odontologistRepository, ModelMapper modelMapper, EmailSenderService emailSenderService) {
+    public AppointmentService(IAppointmentRepository appointmentRepository, IPatientRepository patientRepository, IOdontologistRepository odontologistRepository, ModelMapper modelMapper, EmailSenderService emailSenderService, AppointmentMapper appointmentMapper) {
         this.appointmentRepository = appointmentRepository;
         this.patientRepository = patientRepository;
         this.odontologistRepository = odontologistRepository;
         this.modelMapper = modelMapper;
         this.emailSenderService = emailSenderService;
+        this.appointmentMapper = appointmentMapper;
     }
 
     @Override
@@ -63,7 +66,11 @@ public class AppointmentService implements IAppointmentService{
             appointment1.setPatient(patient.get());
             appointment1.setOdontologist(odontologist.get());
             appointment2=appointmentRepository.save(appointment1);
-            appointmentResponseDto = mapToResponseDto(appointment2);
+            appointmentResponseDto = appointmentMapper.appointmentToAppointmentResponseDTOto(appointment2);
+            System.out.println("============");
+            //System.out.println("cita guardada en repo: " + appointment2);
+            System.out.println("appointmentResponseDto: " + appointmentResponseDto);
+            System.out.println("Email: " + appointmentResponseDto.getPatient().getEmail());
             emailSenderService.sendAppointmentConfirmation(appointmentResponseDto);
         }
         return appointmentResponseDto;
@@ -104,7 +111,7 @@ public class AppointmentService implements IAppointmentService{
             appointment1.setPatient(patient.get());
             appointment1.setOdontologist(odontologist.get());
             appointment2 = appointmentRepository.save(appointment1);
-            AppointmentResponseDto appointmentResponseDto = mapToResponseDto(appointment2);
+            AppointmentResponseDto appointmentResponseDto = appointmentMapper.appointmentToAppointmentResponseDTOto(appointment2);
             emailSenderService.sendAppointmentConfirmation(appointmentResponseDto);
         }
     }

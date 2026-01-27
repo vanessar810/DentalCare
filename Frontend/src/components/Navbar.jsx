@@ -25,6 +25,7 @@ const Navbar = () => {
   };
 
   return (
+    
     <nav className="bg-amber-40 text-white p-4 relative z-50 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
         <h1 className="text-2xl font-bold text-blue-800 dark:text-neutral-400">DentalCare Clinic</h1>

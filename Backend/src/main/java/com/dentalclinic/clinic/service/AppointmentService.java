@@ -26,12 +26,14 @@ public class AppointmentService implements IAppointmentService{
     private IPatientRepository patientRepository;
     private IOdontologistRepository odontologistRepository;
     private ModelMapper modelMapper;
+    private EmailSenderService emailSenderService;
 
-    public AppointmentService(IAppointmentRepository appointmentRepository, IPatientRepository patientRepository, IOdontologistRepository odontologistRepository, ModelMapper modelMapper) {
+    public AppointmentService(IAppointmentRepository appointmentRepository, IPatientRepository patientRepository, IOdontologistRepository odontologistRepository, ModelMapper modelMapper, EmailSenderService emailSenderService) {
         this.appointmentRepository = appointmentRepository;
         this.patientRepository = patientRepository;
         this.odontologistRepository = odontologistRepository;
         this.modelMapper = modelMapper;
+        this.emailSenderService = emailSenderService;
     }
 
     @Override
@@ -62,6 +64,7 @@ public class AppointmentService implements IAppointmentService{
             appointment1.setOdontologist(odontologist.get());
             appointment2=appointmentRepository.save(appointment1);
             appointmentResponseDto = mapToResponseDto(appointment2);
+            emailSenderService.sendAppointmentConfirmation(appointmentResponseDto);
         }
         return appointmentResponseDto;
     }
@@ -94,12 +97,15 @@ public class AppointmentService implements IAppointmentService{
         Optional<Odontologist> odontologist = odontologistRepository.findById(appointmentRequestDto.getOdontologist_id());
         Optional<Appointment> appointment =appointmentRepository.findById(id);
         Appointment appointment1 = new Appointment();
+        Appointment appointment2 = null;
         if (patient.isPresent() && odontologist.isPresent() && appointment.isPresent()){
             appointment1.setId(id);
             appointment1.setDate(appointmentRequestDto.getDate());
             appointment1.setPatient(patient.get());
             appointment1.setOdontologist(odontologist.get());
-            appointmentRepository.save(appointment1);
+            appointment2 = appointmentRepository.save(appointment1);
+            AppointmentResponseDto appointmentResponseDto = mapToResponseDto(appointment2);
+            emailSenderService.sendAppointmentConfirmation(appointmentResponseDto);
         }
     }
 

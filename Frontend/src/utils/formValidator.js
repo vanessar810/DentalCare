@@ -20,20 +20,20 @@ export const validateForm = async ({name, lastname, email, password}) => {
     if (!email || !email.trim()) {
         newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-        newErrors.email = 'Please enter a valid email address';
-    } else {
-        try {
-            const res = await fetch(`http://localhost:8080/api/email/verify?email=${encodeURIComponent(email)}`);
-            const data = await res.json();
-            console.log(data);
-            if (!data.valid) {
-                newErrors.email = 'This email address does not seem to exist';
-            }
-        } catch (error) {
-            console.error('Error verifying email:', error);
-            newErrors.email = 'Could not verify this email. Try again later.';
-        }
-    }
+        newErrors.email = 'Please enter a valid email address';}
+    //  else {
+    //     try {
+    //         const res = await fetch(`http://localhost:8080/api/email/verify?email=${encodeURIComponent(email)}`);
+    //         const data = await res.json();
+    //         console.log(data);
+    //         if (!data.valid) {
+    //             newErrors.email = 'This email address does not seem to exist';
+    //         }
+    //     } catch (error) {
+    //         console.error('Error verifying email:', error);
+    //         newErrors.email = 'Could not verify this email. Try again later.';
+    //     }
+    // }
 
     if (!password) {
         newErrors.password = 'Password is required';

@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import api from '../services/api';
 import { useAuth } from '../providers/AuthProvider';
+import { patientFormValidator } from '../utils/patientFormValidator'
+import { AlertCircle } from 'lucide-react';
 
 const PatientForm = () => {
   const { setUser } = useAuth();
@@ -11,6 +13,7 @@ const PatientForm = () => {
   // console.log('location', location)
   // console.log('userData', userData)
   const navigate = useNavigate();
+  const [errors, setErrors] = useState({});
   const [newPatient, setNewPatient] = useState({
     name: '',
     lastname: '',
@@ -55,6 +58,11 @@ const PatientForm = () => {
 
   const handleAddPatient = async (e) => {
     e.preventDefault();
+    const validation = patientFormValidator(newPatient);
+    if (Object.keys(validation).length > 0) {
+      setErrors(validation)
+      return;
+    }
     try {
       if (newPatient.name && newPatient.lastname) {
         console.log(newPatient)
@@ -62,9 +70,9 @@ const PatientForm = () => {
         await api.post('/patient/profile', newPatient);
         console.log("Perfil de paciente creado");
         setUser(prev => ({
-        ...prev,
-        ...newPatient // 
-      }));
+          ...prev,
+          ...newPatient // 
+        }));
         setNewPatient({
           name: '', lastname: '', dni: '', birthDate: '', address: {
             street: '',
@@ -96,6 +104,12 @@ const PatientForm = () => {
               className="w-full p-3 border rounded-lg dark:bg-gray-300 dark:text-blue-800"
               required
             />
+            {errors.name && (
+              <div className="flex items-center mt-2 text-red-600 text-sm">
+                <AlertCircle className="w-4 h-4 mr-1" />
+                {errors.name}
+              </div>
+            )}
             <input
               type="text"
               name="lastname"
@@ -105,6 +119,12 @@ const PatientForm = () => {
               className="w-full p-3 border rounded-lg dark:bg-gray-300 dark:text-blue-800"
               required
             />
+            {errors.lastname && (
+              <div className="flex items-center mt-2 text-red-600 text-sm">
+                <AlertCircle className="w-4 h-4 mr-1" />
+                {errors.lastname}
+              </div>
+            )}
             <input
               type="text"
               name="dni"
@@ -113,6 +133,12 @@ const PatientForm = () => {
               onChange={handleChange}
               className="w-full p-3 border rounded-lg dark:bg-gray-300"
             />
+            {errors.dni && (
+              <div className="flex items-center mt-2 text-red-600 text-sm">
+                <AlertCircle className="w-4 h-4 mr-1" />
+                {errors.dni}
+              </div>
+            )}
             <input
               type="date"
               name="birthDate"
@@ -121,6 +147,12 @@ const PatientForm = () => {
               onChange={handleChange}
               className="w-full p-3 border rounded-lg dark:bg-gray-300"
             />
+            {errors.birthDate && (
+              <div className="flex items-center mt-2 text-red-600 text-sm">
+                <AlertCircle className="w-4 h-4 mr-1" />
+                {errors.birthDate}
+              </div>
+            )}
             <div className="w-full p-3 border rounded-lg flex justify-around dark:bg-gray-300">
               <input
                 type="text"
@@ -147,6 +179,16 @@ const PatientForm = () => {
                 className="w-32 p-2 border rounded-lg dark:bg-gray-300"
               />
             </div>
+            {errors.street || errors.number || errors.neighborhood && (
+              <div className="flex items-center mt-2 text-red-600 text-sm">
+                <AlertCircle className="w-4 h-4 mr-1" />
+                <div>
+                  {errors.street && <div>{errors.street}</div>}
+                  {errors.number && <div>{errors.number}</div>}
+                  {errors.neighborhood && <div>{errors.neighborhood}</div>}
+                </div>
+              </div>
+            )}
             <button type="submit" className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 dark:text-neutral-400">
               Add Patient
             </button>

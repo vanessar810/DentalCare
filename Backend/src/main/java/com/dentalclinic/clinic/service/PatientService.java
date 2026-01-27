@@ -29,15 +29,18 @@ public class PatientService implements IPatientService{
     private PatientMapper patientMapper;
     private final UserMapper userMapper;
     private PasswordEncoder passwordEncoder;
+    private EmailSenderService emailSenderService;
 
-    public PatientService(IPatientRepository patientRepository, IUserRepository userRepository, ModelMapper modelMapper, PatientMapper patientMapper, UserMapper userMapper, PasswordEncoder passwordEncoder) {
+    public PatientService(IPatientRepository patientRepository, IUserRepository userRepository, ModelMapper modelMapper, PatientMapper patientMapper, UserMapper userMapper, PasswordEncoder passwordEncoder, EmailSenderService emailSenderService) {
         this.patientRepository = patientRepository;
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.patientMapper = patientMapper;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.emailSenderService = emailSenderService;
     }
+
     //create patient as Admin
     public PatientResponseDto createPatient(PatientByAdminRequestDTO patientRequestDto){
         User user = userMapper.userDtoToUser(patientRequestDto.getUser());
@@ -62,7 +65,10 @@ public class PatientService implements IPatientService{
         user.setUserRole(UserRole.PATIENT);
         Patient patient2 = patientRepository.save(patient1);
         userRepository.save(user);
-        return mapToResponseDto(patient2);
+        PatientResponseDto patientResponseDto = patientMapper.patientToPatientResponseDTOto(patient2);
+        System.out.println(patientResponseDto);
+        emailSenderService.sendWelcomeEmail(patientResponseDto);
+        return patientResponseDto;
     }
 
     public PatientResponseDto readId(Integer id){

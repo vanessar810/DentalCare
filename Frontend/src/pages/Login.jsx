@@ -42,16 +42,16 @@ const Login = () => {
         } else {
           navigate('/dashboardPatient', { replace: true });
         }
-      } else if (me.role == 'DENTIST'){
-        navigate('/dashboardDentist', {replace: true});
+      } else if (me.role == 'DENTIST') {
+        navigate('/dashboardDentist', { replace: true });
       }
       else {
-        etErrors({ api: 'Rol no found. Contact administration.' });
+        setErrors({ api: 'Rol no found. Contact administration.' });
       }
     }
     catch (err) {
       console.log("Login error:", err);
-      setErrors({ api: err.response?.data?.message || 'Error al iniciar sesión' });
+      setErrors({ api: err.response?.data?.message || 'Error logging in, please review credentials' });
     } finally {
       setIsLoading(false);
     }
@@ -155,6 +155,12 @@ const Login = () => {
               Forgot password?
             </button>
           </div>
+          {errors.api && (
+              <div className="flex items-center mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                <AlertCircle className="w-5 h-5 mr-2" />
+                {errors.api}
+              </div>
+            )}
           <div className="flex justify-around">
             {/* Login Button */}
             <button
@@ -171,7 +177,7 @@ const Login = () => {
                   Charging...
                 </div>
               ) : (
-                'LogIn'
+                'Login'
               )}
             </button>
           </div>

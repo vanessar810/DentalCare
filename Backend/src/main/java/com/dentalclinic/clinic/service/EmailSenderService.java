@@ -56,6 +56,24 @@ public class EmailSenderService {
         }
     }
 
+    public void sendAppointmentCancellation(AppointmentResponseDto appointment) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(appointment.getPatient().getEmail());
+            message.setSubject("✅ Appointment cancellation - " + clinicName);
+
+            String emailBody = buildAppointmentCancellationBody(appointment);
+            message.setText(emailBody);
+
+            mailSender.send(message);
+            System.out.println("✅ Email enviado a: " + appointment.getPatient().getEmail());
+
+        } catch (Exception e) {
+            System.err.println("Error sending email: " + e.getMessage());
+        }
+    }
+
     private String buildAppointmentConfirmationBody(AppointmentResponseDto appointment) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         String formattedDate = appointment.getDate();
@@ -107,6 +125,31 @@ public class EmailSenderService {
         );
     }
 
+    private String buildAppointmentCancellationBody(AppointmentResponseDto appointment) {
+        String formattedDate = appointment.getDate();
+        return String.format(
+                "Dear %s %s,\n\n" +
+                        "Your appointment is successfully canceled.\n\n" +
+                        "📅 Appointment details:\n" +
+                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                        "Date: %s\n" +
+                        "Dentist: Dr. %s %s\n" +
+                        "Clinic: %s\n" +
+                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
 
+                        "You can reschedule a new appointment throw our website.\n\n" +
+                        "%s\n\n" +
+                        "---\n" +
+                        "This is an automatic email, please do not answer.",
+
+                appointment.getPatient().getName(),
+                appointment.getPatient().getLastname(),
+                formattedDate,
+                appointment.getOdontologist().getName(),
+                appointment.getOdontologist().getLastname(),
+                clinicName,
+                clinicName
+        );
+    }
 
 }

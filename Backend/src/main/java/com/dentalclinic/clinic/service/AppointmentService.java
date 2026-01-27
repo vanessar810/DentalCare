@@ -81,7 +81,7 @@ public class AppointmentService implements IAppointmentService{
         Optional<Appointment> appointmentOptional = appointmentRepository.findById(id);
         if (appointmentOptional.isPresent()){
             Appointment appointment1 = appointmentOptional.get();
-            AppointmentResponseDto appointmentResponseDto = mapToResponseDto(appointment1);
+            AppointmentResponseDto appointmentResponseDto = appointmentMapper.appointmentToAppointmentResponseDTOto(appointment1);
             return appointmentResponseDto;
         }
         return null;
@@ -119,7 +119,9 @@ public class AppointmentService implements IAppointmentService{
     @Override
     public void delete(Integer id) throws ResourceNotFoundException {
         AppointmentResponseDto appointmentOptional = readId(id);
+        System.out.println("appointment to delete: " + appointmentOptional);
         if (appointmentOptional != null) {
+            emailSenderService.sendAppointmentCancellation(appointmentOptional);
             appointmentRepository.deleteById(id);
         } else
             throw new ResourceNotFoundException("{\"message\":\"appointment not found\"}");

@@ -39,10 +39,6 @@ public class EmailSenderService {
     }
     public void sendWelcomeEmail(PatientResponseDto patient) {
         try {
-            System.out.println("=== EMAIL CONFIG DEBUG ===");
-            System.out.println("Username: " + (fromEmail != null ? fromEmail : "NULL"));
-            System.out.println("Clinic Name: " + (clinicName != null ? clinicName : "NULL"));
-            System.out.println("========================");
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(patient.getEmail());

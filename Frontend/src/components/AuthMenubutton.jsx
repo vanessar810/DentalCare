@@ -47,7 +47,7 @@ export default function AuthMenuButton() {
         onFocus={openMenu}
         aria-haspopup="true"
         aria-expanded={open}
-        className="px-4 py-2 rounded-md text-blue-900 dark:text-neutral-400 bg-amber-40 hover:bg-blue-100 focus:outline-none focus:ring"
+        className="px-4 py-2 rounded-md text-blue-900 bg-amber-40 hover:bg-blue-100 focus:outline-none focus:ring dark:text-neutral-400"
       >
         user
       </button>
@@ -57,7 +57,7 @@ export default function AuthMenuButton() {
         <div className="absolute w-30 bg-ambar-40 rounded-md shadow-lg py-2 z-50 dark:bg-black" onMouseLeave={closeMenu}>
           <Link
             to="/login"
-            className="block px-4 py-2 text-blue-900 hover:bg-indigo-50 dark:text-neutral-400"
+            className="block px-4 py-2 text-blue-900 hover:bg-indigo-50 dark:text-neutral-400 "
             onClick={() => setOpen(false)}
           >
             Login

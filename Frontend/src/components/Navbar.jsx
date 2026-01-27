@@ -10,10 +10,10 @@ import { useAuth } from '../providers/AuthProvider';
 const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
 
   const toggleMobileMenu = () => setMenuOpen(!menuOpen);
   const closeMenu = () => setMenuOpen(false);
-  const { user, isAuthenticated, logout } = useAuth();
 
   const getDashboardRoute = (role) => {
     const routes = {
@@ -25,12 +25,12 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-amber-40-600 text-white p-4">
+    <nav className="bg-amber-40 text-white p-4 relative z-50 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
         <h1 className="text-2xl font-bold text-blue-800 dark:text-neutral-400">DentalCare Clinic</h1>
         {isAuthenticated && (
           <div className="text-blue-800 dark:text-neutral-400">
-            Hola, {user?.name || 'usuario'}
+            Hello, {user?.name || 'usuario'}
           </div>
         )}
 
@@ -42,23 +42,31 @@ const Navbar = () => {
         </button>
 
         {/* Enlaces: visibilidad según tamaño de pantalla */}
-        <div className={`
-            flex flex-col md:flex-row gap-3 md:gap-2
+        <div className={`${menuOpen ? "flex" : "hidden md:flex"}
+            flex-col md:flex-row gap-3 md:gap-2
             items-start md:items-center
-            absolute md:static top-16 left-0 w-full md:w-auto bg-amber-40 p-4 md:p-0 z-40
-            transition-all duration-200 ease-in-out
-            ${menuOpen ? 'block' : 'hidden md:flex'}
+            absolute md:static top-16 left-0 w-full md:w-auto bg-amber-40 p-4 md:p-0
+            transition-all duration-200 ease-in-out shadow-lg md:shadow-none dark:bg-black
           `}>
-          <NavLink to="/" className={({ isActive }) => `px-4 py-2 rounded text-blue-900 dark:text-neutral-400 ${isActive ? 'bg-blue-100' : 'hover:bg-blue-700'}`}>Home</NavLink>
+          <NavLink to="/" 
+          onClick={closeMenu}
+          className={({ isActive }) => `px-4 py-2 rounded text-blue-900 dark:text-neutral-400 ${isActive ? 'bg-blue-100 dark:bg-gray-700' : 'hover:bg-blue-200 dark:hover:bg-blue-600'}`}>Home</NavLink>
           {!isAuthenticated && (
-            <NavLink to="/register" className={({ isActive }) => `px-4 py-2 rounded text-blue-900 dark:text-neutral-400 ${isActive ? 'bg-blue-100' : 'hover:bg-blue-100'}`}>Register</NavLink>
+          <NavLink to="/register" 
+            onClick={closeMenu}
+            className={({ isActive }) => `px-4 py-2 rounded text-blue-900 dark:text-neutral-400 ${isActive ? 'bg-blue-100 dark:bg-gray-700' : 'hover:bg-blue-100 dark:hover:bg-blue-600'}`}>Register</NavLink>
           )}
-          <NavLink to="/services" className={({ isActive }) => `px-4 py-2 rounded text-blue-900 dark:text-neutral-400 ${isActive ? 'bg-blue-100' : 'hover:bg-blue-100'}`}>Services</NavLink>
+          <NavLink to="/services" 
+          onClick={closeMenu}
+          className={({ isActive }) => `px-4 py-2 rounded text-blue-900 dark:text-neutral-400 ${isActive ? 'bg-blue-100 dark:bg-gray-700' : 'hover:bg-blue-100 dark:hover:bg-blue-600'}`}>Services</NavLink>
           {isAuthenticated && user?.role && (
-            <NavLink to={getDashboardRoute(user.role)} className={({ isActive }) => `flex flex-col md:flex-row px-4 py-2 rounded text-blue-900 dark:text-neutral-400${isActive ? 'bg-blue-100' : 'hover:bg-blue-100'}`}>Dashboard</NavLink>
+            <NavLink to={getDashboardRoute(user.role)}
+              onClick={closeMenu}
+              className={({ isActive }) => `flex flex-col md:flex-row px-4 py-2 rounded text-blue-900 dark:text-neutral-400 ${isActive ? 'bg-blue-100 dark:bg-gray-700' : 'hover:bg-blue-100 dark:hover:bg-blue-600'}`}>Dashboard</NavLink>
           )}
           <button
-            onClick={toggleTheme}
+            onClick={() =>{toggleTheme();
+            closeMenu();}}
             className="px-4 py-2 rounded bg-amber-40 text-blue-900 dark:text-neutral-400"
             aria-label="Cambiar modo">
             <FontAwesomeIcon

@@ -138,7 +138,7 @@ const DashboardDentist = () => {
                         {[
                             { id: 'overview', label: 'Overview', icon: User2 },
                             { id: 'appointmentsup', label: 'Upcoming appointments', icon: Calendar },
-                            { id: 'pastappointments', label: 'Past appointmentsup', icon: Clock }
+                            { id: 'pastappointments', label: 'Past appointments', icon: Clock }
                         ].map(({ id, label, icon: Icon }) => (
                             <button
                                 key={id}

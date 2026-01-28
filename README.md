@@ -14,17 +14,49 @@ A full-stack web application for managing a dental clinic. Includes secure patie
 
 - User registration and login
 - Role-based access (e.g., admin, dentist, patient)
-- Manage patients (CRUD)
-- Schedule and manage appointments
-- Responsive user interface
+- Manage patients, appointments, and odontologists (CRUD)
+- Schedule and manage appointments in real time
+- Responsive UI for mobile and desktop
 - JWT-based secure authentication
 
-para levantar Frontend:
+🚨🚨 **Important!!**
+Before testing the web app, make sure [DentalCare API](https://dentalcare-1-3w65.onrender.com/swagger-ui/index.html) is running, If the link doesn’t load, the backend server is currently down.
+
+set up Frontend:
 `cd Frontend`
+```npm install```
 ```npm run dev```
-para levantar Backend:
+set up Backend:
 `cd Backend`
+``` mvn clean package -DskipTests```
 ``` mvn spring-boot:run```
+
+💡 Alternatively, if you want to run the built JAR directly:
+```java -jar target/clinic-0.0.1-SNAPSHOT.jar```
+
+👥 Test Accounts
+
+To explore the full functionality, you can use these demo credentials:
+
+Role	            Email	           Password
+Admin	    admin@dentalcare.com       admin123
+Dentist	    dentist@dentalcare.com     dentist123
+Patient	    patient@dentalcare.com     patient123
+
+🎥 Demo
+![App Demo](./Frontend/assets/dentalcare-demo.gif)
+
+
+🚀 Deployment
+
+Frontend: Deployed on Vercel
+
+Backend: Deployed on [Oracle Cloud / Render]
+
+Database: Oracle Cloud Autonomous Database
+
+Web: https://dental-care-lyart.vercel.app/
+SWAGGER: https://dentalcare-1-3w65.onrender.com/swagger-ui/index.html
 
 
 

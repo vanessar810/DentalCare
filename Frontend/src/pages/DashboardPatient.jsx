@@ -114,7 +114,7 @@ const DashboardPatient = () => {
                 const response = await api.put('/patient/me', backendData);
                 setPatientData(response.data)
                 //console.log('lo que devuelve backend: ', response.data)
-                console.log("Information successfully updated");
+                //console.log("Information successfully updated");
             } else if (isEditingAppointment) {
                 const response = await api.put(`/appointment/${formData.id}`, backendData);
                 const patientId = patientData.id;
@@ -145,7 +145,7 @@ const DashboardPatient = () => {
         try {
             if (selectedId) {
                 const response = await api.delete(`/appointment/${selectedId}`);
-                console.log('appointmed successfully deleted', response)
+                //console.log('appointmed successfully deleted', response)
                 setUpcomingAppointments(prev =>
                     prev.filter(appt => appt.id !== selectedId)
                 );

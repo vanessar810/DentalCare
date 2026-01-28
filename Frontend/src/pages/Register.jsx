@@ -21,7 +21,7 @@ const User = () => {
 
   const handleAddUser = async (e) => {
     e.preventDefault();
-    console.log("creating patient")
+    //console.log("creating patient")
     const validationErrors = await validateForm(newUser);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors)
@@ -31,10 +31,10 @@ const User = () => {
     try {
       const { data } = await api.post('/auth/register', newUser);
       storeToken(data.token);
-      console.log("successful register")
+      //console.log("successful register")
 
       setNewUser({ name: '', lastname: '', email: '', password: '' });
-      console.log("Enviando a PatientForm:", newUser);
+      //console.log("Enviando a PatientForm:", newUser);
       navigate('/patientForm', {
         state: {
           name: newUser.name, lastname: newUser.lastname

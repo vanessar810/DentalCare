@@ -145,7 +145,7 @@ const EntityForm = ({
     // Manejar submit del formulario
     const handleSubmit = async () => {
         if (!validateForm()) {
-            console.log('EntityForm: Formulario inválido -', errors);
+            //console.log('EntityForm: Formulario inválido -', errors);
             return;
         }
         setIsLoading(true);

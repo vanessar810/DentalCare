@@ -59,9 +59,9 @@ const DashboardDentist = () => {
         setFormData(null);
     };
     const openEditModal = (item, type, editContext = 'self') => {
-        console.log('🔍1. DashDentist openEditModal item:', item, 'entityType: ', type);
+        //console.log('🔍1. DashDentist openEditModal item:', item, 'entityType: ', type);
         const adaptedItem = adaptBackendToForm(item, type);
-        console.log('2. Adapted item:', adaptedItem);
+        //console.log('2. Adapted item:', adaptedItem);
         setIsEditingProfile(true);
         setFormData(adaptedItem);
         setEditContext(editContext);
@@ -86,11 +86,11 @@ const DashboardDentist = () => {
 
     const handleSubmit = async (entityFormData) => {
         const backendData = adaptFormToBackend(entityFormData, 'odontologist', isEditingProfile)
-        console.log('DashDentist DentisToBackend: ', backendData)
+        //console.log('DashDentist DentisToBackend: ', backendData)
         try {
             const response = await api.put(`odontologist/${dentistData.id}`, backendData)
             setDentisttData(response.data)
-            console.log('DashDentist from back ', response.data)
+           // console.log('DashDentist from back ', response.data)
             closeModal()
         } catch (error) {
             console.error("Error updating data: ", error);

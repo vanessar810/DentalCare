@@ -65,10 +65,10 @@ const PatientForm = () => {
     }
     try {
       if (newPatient.name && newPatient.lastname) {
-        console.log(newPatient)
-        console.log(api.defaults.headers.common.Authorization);
+        // console.log(newPatient)
+        // console.log(api.defaults.headers.common.Authorization);
         await api.post('/patient/profile', newPatient);
-        console.log("Perfil de paciente creado");
+        //console.log("Perfil de paciente creado");
         setUser(prev => ({
           ...prev,
           ...newPatient // 
@@ -79,7 +79,7 @@ const PatientForm = () => {
             number: '', neighborhood: ''
           }
         });
-        console.log("Enviando a dashboard:", newPatient);
+        //console.log("Enviando a dashboard:", newPatient);
         navigate('/dashboardPatient', { state: { ...newPatient }, replace: true });
       };
     } catch (error) {

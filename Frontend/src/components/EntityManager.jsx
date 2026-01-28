@@ -95,7 +95,7 @@ const EntityManager = ({ entityType, onBack }) => {
     }, [data, searchTerm, entityType]);
 
     const openCreateModal = () => {
-        console.log('🔍 EntityManager - selectedItem:', selectedItem);
+        //console.log('🔍 EntityManager - selectedItem:', selectedItem);
         resetForm();
         setModalMode('create');
         setShowModal(true);
@@ -106,7 +106,7 @@ const EntityManager = ({ entityType, onBack }) => {
         const adaptedItem = adaptBackendToForm(item, entityType);
         //.log('2. Adapted item:', adaptedItem);
         setOriginalData(adaptedItem);
-        console.log('originalData: ',originalData)
+        //console.log('originalData: ',originalData)
         handleEdit(adaptedItem);
         setEditContext(editContext);
         setModalMode('edit'); 
@@ -120,8 +120,8 @@ const EntityManager = ({ entityType, onBack }) => {
     };
 
     const onFormSubmit = async (entityFormData) => {
-        console.log('🔍 EntityManager onFormSubmit - Form data(lo que se edito):', entityFormData);
-        console.log('🔍 EntityManager onFormSubmit - selectedItem:', selectedItem);
+        //console.log('🔍 EntityManager onFormSubmit - Form data(lo que se edito):', entityFormData);
+        //console.log('🔍 EntityManager onFormSubmit - selectedItem:', selectedItem);
         const selectedDate = new Date(entityFormData.date);
         const hours = selectedDate.getHours();
         const day = selectedDate.getDay();
@@ -137,19 +137,19 @@ const EntityManager = ({ entityType, onBack }) => {
 
         try {
             const isEdit = entityFormData && entityFormData.id; //de crudOperations
-            console.log('🔍 Operation type:', isEdit ? 'UPDATE' : 'CREATE');
+            //console.log('🔍 Operation type:', isEdit ? 'UPDATE' : 'CREATE');
 
             // Adaptar datos según el tipo de operación
             const backendData = adaptFormToBackend(entityFormData, entityType, isEdit);
 
             if (isEdit) {
                 await put(entityFormData.id, backendData);
-                console.log(backendData)
-                console.log(`${config.singularName} actualizado exitosamente`);
+                //console.log(backendData)
+               // console.log(`${config.singularName} actualizado exitosamente`);
             } else {
                 await post(backendData);
-                console.log(backendData)
-                console.log(`${config.singularName} creado exitosamente`);
+                // console.log(backendData)
+                // console.log(`${config.singularName} creado exitosamente`);
             }
             await get();
             closeModal();

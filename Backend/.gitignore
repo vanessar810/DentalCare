@@ -4,8 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 src/test/java/com/dentalclinic/clinic/service/PasswordEncoderTest.java
-src/main/resources/application.properties
-
+src/main/resources/application-dev.properties
+*.log
+CUsersvanerProyectosDentalCarebackenddb_clinic_backup.sql
+db_clinic_backup.sql
 ### STS ###
 .apt_generated
 .classpath

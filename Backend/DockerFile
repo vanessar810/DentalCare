@@ -1,4 +1,4 @@
-FROM maven:3.9-eclipse-temurin-17 AS build
+FROM maven:3.9-eclipse-temurin-21 AS build
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Etapa de ejecución
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
@@ -20,5 +20,8 @@ COPY --from=build /app/target/clinic-0.0.1-SNAPSHOT.jar app.jar
 # Exponer el puerto
 EXPOSE 8080
 
+# Configuración de la JVM para entornos con poca memoria
+ENV JAVA_OPTS="-Xmx512m -Xms256m"
+
 # Comando para ejecutar la aplicación
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

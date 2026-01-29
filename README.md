@@ -44,7 +44,7 @@ Dentist	    dentist@dentalcare.com     dentist123
 Patient	    patient@dentalcare.com     patient123
 
 🎥 Demo
-![App Demo](./Frontend/assets/dentalcare-demo.gif)
+![App Demo](./Frontend/src/assets/dentalcare-demo.mp4)
 
 
 🚀 Deployment
